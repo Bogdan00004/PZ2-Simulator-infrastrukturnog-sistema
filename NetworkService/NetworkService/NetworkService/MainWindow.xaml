@@ -1,12 +1,177 @@
 ﻿<Window x:Class="NetworkService.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:NetworkService"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        xmlns:vm="clr-namespace:NetworkService.ViewModel"
+        xmlns:views="clr-namespace:NetworkService.Views"
+        Title="NetworkService Monitor"
+        Height="820" Width="1400"
+        MinHeight="700" MinWidth="1100"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource UIPrimaryColor}">
+
+    <!-- DataTemplates: ViewModel → View mapping -->
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type vm:NetworkEntitiesViewModel}">
+            <views:NetworkEntitiesView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:MeasurementGraphViewModel}">
+            <views:MeasurementGraphView/>
+        </DataTemplate>
+    </Window.Resources>
+
+    <!-- Keyboard shortcuts (CG1) -->
+    <Window.InputBindings>
+        <KeyBinding Key="F1"
+                    Command="{Binding NavigateCommand}"
+                    CommandParameter="entities"/>
+        <KeyBinding Key="F2"
+                    Command="{Binding NavigateCommand}"
+                    CommandParameter="graph"/>
+    </Window.InputBindings>
+
     <Grid>
-        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="56"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="32"/>
+        </Grid.RowDefinitions>
+
+        <!-- ==================== HEADER ==================== -->
+        <Border Grid.Row="0"
+                Background="{StaticResource UISecondaryColor}"
+                BorderBrush="{StaticResource UIBorderColor}"
+                BorderThickness="0,0,0,1">
+            <Grid Margin="16,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- App title -->
+                <StackPanel Grid.Column="0"
+                            Orientation="Horizontal"
+                            VerticalAlignment="Center">
+                    <TextBlock Text="⬡"
+                               FontSize="22"
+                               Foreground="{StaticResource UIAccentColor}"
+                               VerticalAlignment="Center"
+                               Margin="0,0,10,0"/>
+                    <TextBlock Text="NETWORKSERVICE"
+                               FontSize="16"
+                               FontWeight="Bold"
+                               Foreground="{StaticResource UITextColor}"
+                               VerticalAlignment="Center"/>
+                    <TextBlock Text="  |  PRESSURE MONITORING SYSTEM"
+                               FontSize="12"
+                               Foreground="{StaticResource UIBorderColor}"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- Navigation buttons (CG1: F1/F2 shortcuts) -->
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center">
+                    <Button Content="⊞  NETWORK ENTITIES  [F1]"
+                            Width="220" Height="34"
+                            Command="{Binding NavigateCommand}"
+                            CommandParameter="entities"
+                            Margin="0,0,8,0"
+                            ToolTip="View and manage all entities (F1)"/>
+                    <Button Content="◉  MEASUREMENT GRAPH  [F2]"
+                            Width="220" Height="34"
+                            Command="{Binding NavigateCommand}"
+                            CommandParameter="graph"
+                            ToolTip="View measurement history graph (F2)"/>
+                </StackPanel>
+
+                <!-- Entity count -->
+                <StackPanel Grid.Column="2"
+                            Orientation="Horizontal"
+                            VerticalAlignment="Center">
+                    <TextBlock Text="ENTITIES: "
+                               FontSize="11"
+                               Foreground="{StaticResource UIBorderColor}"
+                               VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding EntityCount}"
+                               FontSize="20"
+                               FontWeight="Bold"
+                               Foreground="{StaticResource UIAccentColor}"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ==================== MAIN CONTENT ==================== -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="440"/>
+                <ColumnDefinition Width="4"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- LEFT: Network Display (always visible — CG1) -->
+            <Border Grid.Column="0"
+                    Background="{StaticResource UISecondaryColor}"
+                    BorderBrush="{StaticResource UIBorderColor}"
+                    BorderThickness="0,0,1,0">
+                <views:NetworkDisplayView/>
+            </Border>
+
+            <!-- Separator -->
+            <Rectangle Grid.Column="1"
+                       Fill="{StaticResource UIBorderColor}"/>
+
+            <!-- RIGHT: Switchable content -->
+            <ContentControl Grid.Column="2"
+                            Content="{Binding CurrentViewModel}"/>
+        </Grid>
+
+        <!-- ==================== STATUS BAR ==================== -->
+        <Border Grid.Row="2"
+                Background="{StaticResource UISecondaryColor}"
+                BorderBrush="{StaticResource UIBorderColor}"
+                BorderThickness="0,1,0,0">
+            <Grid Margin="16,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Connection status -->
+                <StackPanel Grid.Column="0"
+                            Orientation="Horizontal"
+                            VerticalAlignment="Center">
+                    <Ellipse Width="8" Height="8"
+                             Fill="{StaticResource UISuccessColor}"
+                             Margin="0,0,6,0"/>
+                    <TextBlock Text="{Binding ConnectionStatus}"
+                               FontSize="11"
+                               Foreground="{StaticResource UITextColor}"/>
+                </StackPanel>
+
+                <!-- Shortcuts hint -->
+                <TextBlock Grid.Column="1"
+                           Text="F1 — Network Entities  |  F2 — Measurement Graph"
+                           FontSize="11"
+                           Foreground="{StaticResource UIBorderColor}"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"/>
+
+                <!-- Last update -->
+                <StackPanel Grid.Column="2"
+                            Orientation="Horizontal"
+                            VerticalAlignment="Center">
+                    <TextBlock Text="Last update: "
+                               FontSize="11"
+                               Foreground="{StaticResource UIBorderColor}"/>
+                    <TextBlock Text="{Binding LastUpdateTime}"
+                               FontSize="11"
+                               Foreground="{StaticResource UITextColor}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
     </Grid>
 </Window>

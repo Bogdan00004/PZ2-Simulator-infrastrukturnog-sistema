@@ -1,26 +1,128 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using NetworkService.Model;
+using System;
+using System.Collections.ObjectModel;
+using System.Globalization;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
+using System.Windows;
 
 namespace NetworkService.ViewModel
 {
-    public class MainWindowViewModel
+    public class MainWindowViewModel : BindableBase
     {
-        private int count = 15; // Inicijalna vrednost broja objekata u sistemu
-                                // ######### ZAMENITI stvarnim brojem elemenata
-                                //           zavisno od broja entiteta u listi
+        // =============================================
+        // Shared entities — accessible by all ViewModels
+        // =============================================
+        public static ObservableCollection<PressureGauge> Entities { get; private set; }
+            = new ObservableCollection<PressureGauge>();
 
-        public MainWindowViewModel()
+        // =============================================
+        // Navigation
+        // =============================================
+        private BindableBase _currentViewModel;
+        public BindableBase CurrentViewModel
         {
-            createListener(); //Povezivanje sa serverskom aplikacijom
+            get => _currentViewModel;
+            set => SetProperty(ref _currentViewModel, value);
         }
 
-        private void createListener()
+        private readonly NetworkEntitiesViewModel _networkEntitiesViewModel;
+        private readonly MeasurementGraphViewModel _measurementGraphViewModel;
+
+        public MyICommand<string> NavigateCommand { get; private set; }
+
+        // =============================================
+        // Status bar
+        // =============================================
+        private string _lastUpdateTime = "—";
+        public string LastUpdateTime
+        {
+            get => _lastUpdateTime;
+            set => SetProperty(ref _lastUpdateTime, value);
+        }
+
+        private string _connectionStatus = "Waiting for simulator...";
+        public string ConnectionStatus
+        {
+            get => _connectionStatus;
+            set => SetProperty(ref _connectionStatus, value);
+        }
+
+        public int EntityCount => Entities.Count;
+
+        // =============================================
+        // Constructor
+        // =============================================
+        public MainWindowViewModel()
+        {
+            InitializeSampleEntities();
+
+            _networkEntitiesViewModel = new NetworkEntitiesViewModel();
+            _measurementGraphViewModel = new MeasurementGraphViewModel();
+
+            NavigateCommand = new MyICommand<string>(OnNavigate);
+
+            // CG1: Start on Network Entities View
+            CurrentViewModel = _networkEntitiesViewModel;
+
+            Entities.CollectionChanged += (s, e) => OnPropertyChanged(nameof(EntityCount));
+
+            InitializeTcpListener();
+        }
+
+        // =============================================
+        // Navigation logic (CG1: Entities ↔ Graph)
+        // =============================================
+        private void OnNavigate(string destination)
+        {
+            switch (destination)
+            {
+                case "entities":
+                    CurrentViewModel = _networkEntitiesViewModel;
+                    break;
+                case "graph":
+                    CurrentViewModel = _measurementGraphViewModel;
+                    break;
+            }
+        }
+
+        // =============================================
+        // Pre-created sample entities (minimum 3)
+        // =============================================
+        private void InitializeSampleEntities()
+        {
+            var cableSensor = PressureGaugeType.PredefinedTypes[0];
+            var digitalManometer = PressureGaugeType.PredefinedTypes[1];
+
+            Entities.Add(new PressureGauge
+            {
+                Id = 1,
+                Name = "PG-VALVE-001",
+                Type = cableSensor,
+                CurrentValue = 8.5
+            });
+            Entities.Add(new PressureGauge
+            {
+                Id = 2,
+                Name = "PG-VALVE-002",
+                Type = digitalManometer,
+                CurrentValue = 12.3
+            });
+            Entities.Add(new PressureGauge
+            {
+                Id = 3,
+                Name = "PG-VALVE-003",
+                Type = cableSensor,
+                CurrentValue = 6.7
+            });
+        }
+
+        // =============================================
+        // TCP Listener
+        // =============================================
+        private void InitializeTcpListener()
         {
             var tcp = new TcpListener(IPAddress.Any, 25675);
             tcp.Start();
@@ -30,36 +132,28 @@ namespace NetworkService.ViewModel
                 while (true)
                 {
                     var tcpClient = tcp.AcceptTcpClient();
-                    ThreadPool.QueueUserWorkItem(param =>
+                    ThreadPool.QueueUserWorkItem(_ =>
                     {
-                        //Prijem poruke
-                        NetworkStream stream = tcpClient.GetStream();
-                        string incomming;
-                        byte[] bytes = new byte[1024];
-                        int i = stream.Read(bytes, 0, bytes.Length);
-                        //Primljena poruka je sacuvana u incomming stringu
-                        incomming = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
-
-                        //Ukoliko je primljena poruka pitanje koliko objekata ima u sistemu -> odgovor
-                        if (incomming.Equals("Need object count"))
+                        try
                         {
-                            //Response
-                            /* Umesto sto se ovde salje count.ToString(), potrebno je poslati 
-                             * duzinu liste koja sadrzi sve objekte pod monitoringom, odnosno
-                             * njihov ukupan broj (NE BROJATI OD NULE, VEC POSLATI UKUPAN BROJ)
-                             * */
-                            Byte[] data = System.Text.Encoding.ASCII.GetBytes(count.ToString());
-                            stream.Write(data, 0, data.Length);
+                            NetworkStream stream = tcpClient.GetStream();
+                            byte[] bytes = new byte[1024];
+                            int bytesRead = stream.Read(bytes, 0, bytes.Length);
+                            string incoming = System.Text.Encoding.ASCII.GetString(bytes, 0, bytesRead);
+
+                            if (incoming.Equals("Need object count"))
+                            {
+                                byte[] response = System.Text.Encoding.ASCII.GetBytes(Entities.Count.ToString());
+                                stream.Write(response, 0, response.Length);
+                            }
+                            else
+                            {
+                                ProcessMeasurement(incoming);
+                            }
                         }
-                        else
+                        catch (Exception ex)
                         {
-                            //U suprotnom, server je poslao promenu stanja nekog objekta u sistemu
-                            Console.WriteLine(incomming); //Na primer: "Entitet_1:272"
-
-                            //################ IMPLEMENTACIJA ####################
-                            // Obraditi poruku kako bi se dobile informacije o izmeni
-                            // Azuriranje potrebnih stvari u aplikaciji
-
+                            Console.WriteLine($"[TCP Error] {ex.Message}");
                         }
                     }, null);
                 }
@@ -67,6 +161,87 @@ namespace NetworkService.ViewModel
 
             listeningThread.IsBackground = true;
             listeningThread.Start();
+        }
+
+        // =============================================
+        // Process incoming measurement
+        // Format: "Entitet_N:value"
+        // =============================================
+        private void ProcessMeasurement(string message)
+        {
+            try
+            {
+                var parts = message.Split(':');
+                if (parts.Length != 2) return;
+
+                int entityIndex = int.Parse(parts[0].Replace("Entitet_", ""));
+                double value = double.Parse(parts[1], CultureInfo.InvariantCulture);
+
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    if (entityIndex < 0 || entityIndex >= Entities.Count) return;
+
+                    Entities[entityIndex].CurrentValue = value;
+                    LastUpdateTime = DateTime.Now.ToString("HH:mm:ss");
+                    ConnectionStatus = "Connected";
+
+                    WriteToLog(Entities[entityIndex], value);
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Measurement Error] {ex.Message}");
+            }
+        }
+
+        // =============================================
+        // Simulator restart (called after add/delete)
+        // =============================================
+        public static void RestartSimulator()
+        {
+            try
+            {
+                foreach (var process in System.Diagnostics.Process.GetProcessesByName("MeteringSimulator"))
+                {
+                    process.Kill();
+                    process.WaitForExit();
+                }
+
+                string simulatorPath = Path.Combine(
+                    AppDomain.CurrentDomain.BaseDirectory,
+                    @"..\..\..\..\MeteringSimulator\MeteringSimulator\bin\Debug\MeteringSimulator.exe"
+                );
+
+                if (File.Exists(simulatorPath))
+                    System.Diagnostics.Process.Start(simulatorPath);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Simulator Restart Error] {ex.Message}");
+            }
+        }
+
+        // =============================================
+        // Log file writer
+        // =============================================
+        private static void WriteToLog(PressureGauge entity, double value)
+        {
+            try
+            {
+                string logPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Log.txt");
+                string status = entity.IsValueValid ? "VALID" : "OUT OF RANGE";
+                string logEntry = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} | " +
+                                  $"Entity: {entity.Name} (ID: {entity.Id}) | " +
+                                  $"Type: {entity.TypeName} | " +
+                                  $"Value: {value:F2} MPa | " +
+                                  $"Status: {status}{Environment.NewLine}";
+
+                File.AppendAllText(logPath, logEntry);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Log Error] {ex.Message}");
+            }
         }
     }
 }
