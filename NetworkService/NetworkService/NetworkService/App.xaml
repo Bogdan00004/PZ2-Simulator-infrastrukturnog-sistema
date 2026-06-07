@@ -4,6 +4,149 @@
              xmlns:local="clr-namespace:NetworkService"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+
+        <!-- COLOR PALETTE -->
+        <SolidColorBrush x:Key="UIPrimaryColor"     Color="#1E2328"/>
+        <SolidColorBrush x:Key="UISecondaryColor"   Color="#2C3138"/>
+        <SolidColorBrush x:Key="UIAccentColor"      Color="#4A7FA5"/>
+        <SolidColorBrush x:Key="UITextColor"        Color="#E8ECF0"/>
+        <SolidColorBrush x:Key="UIBorderColor"      Color="#3D4550"/>
+        <SolidColorBrush x:Key="UISuccessColor"     Color="#3D8B5E"/>
+        <SolidColorBrush x:Key="UIAlertColor"       Color="#E6A817"/>
+        <SolidColorBrush x:Key="UIDangerColor"      Color="#C0392B"/>
+        <SolidColorBrush x:Key="UIHoverColor"       Color="#374049"/>
+
+        <!-- GLOBAL STYLES -->
+
+        <!-- Window base style -->
+        <Style TargetType="Window">
+            <Setter Property="Background" Value="{StaticResource UIPrimaryColor}"/>
+            <Setter Property="Foreground" Value="{StaticResource UITextColor}"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize"   Value="14"/>
+        </Style>
+
+        <!-- TextBlock -->
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource UITextColor}"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+        </Style>
+
+        <!-- Label -->
+        <Style TargetType="Label">
+            <Setter Property="Foreground" Value="{StaticResource UITextColor}"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+        </Style>
+
+        <!-- Standard Button -->
+        <Style TargetType="Button">
+            <Setter Property="Background"           Value="{StaticResource UIAccentColor}"/>
+            <Setter Property="Foreground"           Value="{StaticResource UITextColor}"/>
+            <Setter Property="BorderBrush"          Value="{StaticResource UIBorderColor}"/>
+            <Setter Property="BorderThickness"      Value="1"/>
+            <Setter Property="Padding"              Value="12,6"/>
+            <Setter Property="FontFamily"           Value="Segoe UI"/>
+            <Setter Property="FontSize"             Value="13"/>
+            <Setter Property="Cursor"               Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{StaticResource UIHoverColor}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.4"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- TextBox -->
+        <Style TargetType="TextBox">
+            <Setter Property="Background"      Value="{StaticResource UISecondaryColor}"/>
+            <Setter Property="Foreground"      Value="{StaticResource UITextColor}"/>
+            <Setter Property="BorderBrush"     Value="{StaticResource UIBorderColor}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding"         Value="6,4"/>
+            <Setter Property="FontFamily"      Value="Segoe UI"/>
+            <Setter Property="FontSize"        Value="13"/>
+            <Setter Property="CaretBrush"      Value="{StaticResource UITextColor}"/>
+        </Style>
+
+        <!-- ComboBox -->
+        <Style TargetType="ComboBox">
+            <Setter Property="Background"      Value="{StaticResource UISecondaryColor}"/>
+            <Setter Property="Foreground"      Value="{StaticResource UITextColor}"/>
+            <Setter Property="BorderBrush"     Value="{StaticResource UIBorderColor}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding"         Value="6,4"/>
+            <Setter Property="FontFamily"      Value="Segoe UI"/>
+            <Setter Property="FontSize"        Value="13"/>
+        </Style>
+
+        <!-- RadioButton -->
+        <Style TargetType="RadioButton">
+            <Setter Property="Foreground" Value="{StaticResource UITextColor}"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize"   Value="13"/>
+            <Setter Property="Cursor"     Value="Hand"/>
+            <Setter Property="Margin"     Value="0,0,10,0"/>
+        </Style>
+
+        <!-- DataGrid -->
+        <Style TargetType="DataGrid">
+            <Setter Property="Background"            Value="{StaticResource UISecondaryColor}"/>
+            <Setter Property="Foreground"            Value="{StaticResource UITextColor}"/>
+            <Setter Property="BorderBrush"           Value="{StaticResource UIBorderColor}"/>
+            <Setter Property="HorizontalGridLinesBrush" Value="{StaticResource UIBorderColor}"/>
+            <Setter Property="VerticalGridLinesBrush"   Value="{StaticResource UIBorderColor}"/>
+            <Setter Property="RowBackground"         Value="{StaticResource UISecondaryColor}"/>
+            <Setter Property="AlternatingRowBackground" Value="{StaticResource UIPrimaryColor}"/>
+            <Setter Property="FontFamily"            Value="Segoe UI"/>
+            <Setter Property="FontSize"              Value="13"/>
+        </Style>
+
+        <Style TargetType="DataGridColumnHeader">
+            <Setter Property="Background"  Value="{StaticResource UIPrimaryColor}"/>
+            <Setter Property="Foreground"  Value="{StaticResource UIAccentColor}"/>
+            <Setter Property="FontWeight"  Value="SemiBold"/>
+            <Setter Property="Padding"     Value="8,6"/>
+            <Setter Property="BorderBrush" Value="{StaticResource UIBorderColor}"/>
+            <Setter Property="BorderThickness" Value="0,0,1,1"/>
+        </Style>
+
+        <Style TargetType="DataGridCell">
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="Padding"     Value="6,4"/>
+        </Style>
+
+        <Style TargetType="DataGridRow">
+            <Setter Property="Foreground" Value="{StaticResource UITextColor}"/>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="{StaticResource UIAccentColor}"/>
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource UIHoverColor}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- ScrollBar -->
+        <Style TargetType="ScrollBar">
+            <Setter Property="Background" Value="{StaticResource UISecondaryColor}"/>
+        </Style>
+
     </Application.Resources>
 </Application>
