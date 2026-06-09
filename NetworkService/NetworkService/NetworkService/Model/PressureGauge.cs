@@ -4,7 +4,6 @@ namespace NetworkService.Model
 {
     public class PressureGauge : ValidationBase
     {
-        // Valid measurement range for T1 (MPa)
         public const double MinValidValue = 5.0;
         public const double MaxValidValue = 16.0;
 
@@ -43,21 +42,23 @@ namespace NetworkService.Model
                 SetProperty(ref _currentValue, value);
                 OnPropertyChanged(nameof(IsValueValid));
                 OnPropertyChanged(nameof(ValueDisplay));
+                OnPropertyChanged(nameof(StatusText));
             }
         }
 
-        // Computed properties
         public string TypeName => _type?.Name ?? "Unknown";
 
-        public bool IsValueValid =>
-            _currentValue.HasValue &&
-            _currentValue.Value >= MinValidValue &&
-            _currentValue.Value <= MaxValidValue;
+        public bool IsValueValid => _currentValue.HasValue
+                                     && _currentValue.Value >= MinValidValue
+                                     && _currentValue.Value <= MaxValidValue;
 
-        public string ValueDisplay =>
-            _currentValue.HasValue
-                ? $"{_currentValue.Value:F2} MPa"
-                : "No reading";
+        public string ValueDisplay => _currentValue.HasValue
+                                      ? $"{_currentValue.Value:F2} MPa"
+                                      : "No reading";
+
+        public string StatusText => !_currentValue.HasValue
+                                     ? "NO READING"
+                                     : IsValueValid ? "VALID" : "OUT OF RANGE";
 
         protected override void ValidateSelf()
         {

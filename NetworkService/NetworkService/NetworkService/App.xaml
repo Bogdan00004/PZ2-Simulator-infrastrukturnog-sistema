@@ -2,8 +2,12 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:NetworkService"
+             xmlns:helpers="clr-namespace:NetworkService.Helpers"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
+
+        <!-- Converters -->
+        <helpers:CountToBoolConverter x:Key="CountToBoolConverter"/>
 
         <!-- COLOR PALETTE -->
         <SolidColorBrush x:Key="UIPrimaryColor"     Color="#1E2328"/>
@@ -17,8 +21,6 @@
         <SolidColorBrush x:Key="UIHoverColor"       Color="#374049"/>
 
         <!-- GLOBAL STYLES -->
-
-        <!-- Window base style -->
         <Style TargetType="Window">
             <Setter Property="Background" Value="{StaticResource UIPrimaryColor}"/>
             <Setter Property="Foreground" Value="{StaticResource UITextColor}"/>
@@ -26,28 +28,25 @@
             <Setter Property="FontSize"   Value="14"/>
         </Style>
 
-        <!-- TextBlock -->
         <Style TargetType="TextBlock">
             <Setter Property="Foreground" Value="{StaticResource UITextColor}"/>
             <Setter Property="FontFamily" Value="Segoe UI"/>
         </Style>
 
-        <!-- Label -->
         <Style TargetType="Label">
             <Setter Property="Foreground" Value="{StaticResource UITextColor}"/>
             <Setter Property="FontFamily" Value="Segoe UI"/>
         </Style>
 
-        <!-- Standard Button -->
         <Style TargetType="Button">
-            <Setter Property="Background"           Value="{StaticResource UIAccentColor}"/>
-            <Setter Property="Foreground"           Value="{StaticResource UITextColor}"/>
-            <Setter Property="BorderBrush"          Value="{StaticResource UIBorderColor}"/>
-            <Setter Property="BorderThickness"      Value="1"/>
-            <Setter Property="Padding"              Value="12,6"/>
-            <Setter Property="FontFamily"           Value="Segoe UI"/>
-            <Setter Property="FontSize"             Value="13"/>
-            <Setter Property="Cursor"               Value="Hand"/>
+            <Setter Property="Background"      Value="{StaticResource UIAccentColor}"/>
+            <Setter Property="Foreground"      Value="{StaticResource UITextColor}"/>
+            <Setter Property="BorderBrush"     Value="{StaticResource UIBorderColor}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding"         Value="12,6"/>
+            <Setter Property="FontFamily"      Value="Segoe UI"/>
+            <Setter Property="FontSize"        Value="13"/>
+            <Setter Property="Cursor"          Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -72,7 +71,6 @@
             </Setter>
         </Style>
 
-        <!-- TextBox -->
         <Style TargetType="TextBox">
             <Setter Property="Background"      Value="{StaticResource UISecondaryColor}"/>
             <Setter Property="Foreground"      Value="{StaticResource UITextColor}"/>
@@ -84,7 +82,6 @@
             <Setter Property="CaretBrush"      Value="{StaticResource UITextColor}"/>
         </Style>
 
-        <!-- ComboBox -->
         <Style TargetType="ComboBox">
             <Setter Property="Background"      Value="{StaticResource UISecondaryColor}"/>
             <Setter Property="Foreground"      Value="{StaticResource UITextColor}"/>
@@ -95,7 +92,6 @@
             <Setter Property="FontSize"        Value="13"/>
         </Style>
 
-        <!-- RadioButton -->
         <Style TargetType="RadioButton">
             <Setter Property="Foreground" Value="{StaticResource UITextColor}"/>
             <Setter Property="FontFamily" Value="Segoe UI"/>
@@ -104,25 +100,24 @@
             <Setter Property="Margin"     Value="0,0,10,0"/>
         </Style>
 
-        <!-- DataGrid -->
         <Style TargetType="DataGrid">
-            <Setter Property="Background"            Value="{StaticResource UISecondaryColor}"/>
-            <Setter Property="Foreground"            Value="{StaticResource UITextColor}"/>
-            <Setter Property="BorderBrush"           Value="{StaticResource UIBorderColor}"/>
+            <Setter Property="Background"               Value="{StaticResource UISecondaryColor}"/>
+            <Setter Property="Foreground"               Value="{StaticResource UITextColor}"/>
+            <Setter Property="BorderBrush"              Value="{StaticResource UIBorderColor}"/>
             <Setter Property="HorizontalGridLinesBrush" Value="{StaticResource UIBorderColor}"/>
             <Setter Property="VerticalGridLinesBrush"   Value="{StaticResource UIBorderColor}"/>
-            <Setter Property="RowBackground"         Value="{StaticResource UISecondaryColor}"/>
+            <Setter Property="RowBackground"            Value="{StaticResource UISecondaryColor}"/>
             <Setter Property="AlternatingRowBackground" Value="{StaticResource UIPrimaryColor}"/>
-            <Setter Property="FontFamily"            Value="Segoe UI"/>
-            <Setter Property="FontSize"              Value="13"/>
+            <Setter Property="FontFamily"               Value="Segoe UI"/>
+            <Setter Property="FontSize"                 Value="13"/>
         </Style>
 
         <Style TargetType="DataGridColumnHeader">
-            <Setter Property="Background"  Value="{StaticResource UIPrimaryColor}"/>
-            <Setter Property="Foreground"  Value="{StaticResource UIAccentColor}"/>
-            <Setter Property="FontWeight"  Value="SemiBold"/>
-            <Setter Property="Padding"     Value="8,6"/>
-            <Setter Property="BorderBrush" Value="{StaticResource UIBorderColor}"/>
+            <Setter Property="Background"      Value="{StaticResource UIPrimaryColor}"/>
+            <Setter Property="Foreground"      Value="{StaticResource UIAccentColor}"/>
+            <Setter Property="FontWeight"      Value="SemiBold"/>
+            <Setter Property="Padding"         Value="8,6"/>
+            <Setter Property="BorderBrush"     Value="{StaticResource UIBorderColor}"/>
             <Setter Property="BorderThickness" Value="0,0,1,1"/>
         </Style>
 
@@ -141,11 +136,6 @@
                     <Setter Property="Background" Value="{StaticResource UIHoverColor}"/>
                 </Trigger>
             </Style.Triggers>
-        </Style>
-
-        <!-- ScrollBar -->
-        <Style TargetType="ScrollBar">
-            <Setter Property="Background" Value="{StaticResource UISecondaryColor}"/>
         </Style>
 
     </Application.Resources>
