@@ -31,19 +31,21 @@ namespace NetworkService.ViewModel
         private readonly NetworkEntitiesViewModel _networkEntitiesViewModel;
         private readonly MeasurementGraphViewModel _measurementGraphViewModel;
 
+        public NetworkDisplayViewModel NetworkDisplayViewModel { get; private set; }
         public MyICommand<string> NavigateCommand { get; private set; }
 
         // =============================================
         // Status bar
         // =============================================
         private string _lastUpdateTime = "—";
+        private string _connectionStatus = "Waiting for simulator...";
+
         public string LastUpdateTime
         {
             get => _lastUpdateTime;
             set => SetProperty(ref _lastUpdateTime, value);
         }
 
-        private string _connectionStatus = "Waiting for simulator...";
         public string ConnectionStatus
         {
             get => _connectionStatus;
@@ -61,10 +63,9 @@ namespace NetworkService.ViewModel
 
             _networkEntitiesViewModel = new NetworkEntitiesViewModel();
             _measurementGraphViewModel = new MeasurementGraphViewModel();
+            NetworkDisplayViewModel = new NetworkDisplayViewModel();
 
             NavigateCommand = new MyICommand<string>(OnNavigate);
-
-            // CG1: Start on Network Entities View
             CurrentViewModel = _networkEntitiesViewModel;
 
             Entities.CollectionChanged += (s, e) => OnPropertyChanged(nameof(EntityCount));
@@ -73,7 +74,7 @@ namespace NetworkService.ViewModel
         }
 
         // =============================================
-        // Navigation logic (CG1: Entities ↔ Graph)
+        // Navigation (CG1: Entities ↔ Graph)
         // =============================================
         private void OnNavigate(string destination)
         {
@@ -139,11 +140,13 @@ namespace NetworkService.ViewModel
                             NetworkStream stream = tcpClient.GetStream();
                             byte[] bytes = new byte[1024];
                             int bytesRead = stream.Read(bytes, 0, bytes.Length);
-                            string incoming = System.Text.Encoding.ASCII.GetString(bytes, 0, bytesRead);
+                            string incoming = System.Text.Encoding.ASCII
+                                                        .GetString(bytes, 0, bytesRead);
 
                             if (incoming.Equals("Need object count"))
                             {
-                                byte[] response = System.Text.Encoding.ASCII.GetBytes(Entities.Count.ToString());
+                                byte[] response = System.Text.Encoding.ASCII
+                                                    .GetBytes(Entities.Count.ToString());
                                 stream.Write(response, 0, response.Length);
                             }
                             else
@@ -195,30 +198,59 @@ namespace NetworkService.ViewModel
         }
 
         // =============================================
-        // Simulator restart (called after add/delete)
+        // Simulator restart — called after add/delete
         // =============================================
         public static void RestartSimulator()
         {
             try
             {
-                foreach (var process in System.Diagnostics.Process.GetProcessesByName("MeteringSimulator"))
+                foreach (var process in
+                    System.Diagnostics.Process.GetProcessesByName("MeteringSimulator"))
                 {
                     process.Kill();
                     process.WaitForExit();
                 }
 
-                string simulatorPath = Path.Combine(
-                    AppDomain.CurrentDomain.BaseDirectory,
-                    @"..\..\..\..\MeteringSimulator\MeteringSimulator\bin\Debug\MeteringSimulator.exe"
-                );
+                string simulatorPath = FindSimulatorExecutable();
 
-                if (File.Exists(simulatorPath))
+                if (simulatorPath != null)
                     System.Diagnostics.Process.Start(simulatorPath);
+                else
+                    Console.WriteLine("[Simulator] MeteringSimulator.exe not found.");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"[Simulator Restart Error] {ex.Message}");
             }
+        }
+
+        private static string FindSimulatorExecutable()
+        {
+            DirectoryInfo currentDir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+
+            for (int i = 0; i < 8; i++)
+            {
+                if (currentDir == null) break;
+
+                string[] candidatePaths =
+                {
+                    Path.Combine(currentDir.FullName, "MeteringSimulator", "MeteringSimulator",
+                                 "bin", "Debug", "MeteringSimulator.exe"),
+                    Path.Combine(currentDir.FullName, "MeteringSimulator",
+                                 "bin", "Debug", "MeteringSimulator.exe"),
+                    Path.Combine(currentDir.FullName, "MeteringSimulator.exe")
+                };
+
+                foreach (string candidate in candidatePaths)
+                {
+                    if (File.Exists(candidate))
+                        return candidate;
+                }
+
+                currentDir = currentDir.Parent;
+            }
+
+            return null;
         }
 
         // =============================================

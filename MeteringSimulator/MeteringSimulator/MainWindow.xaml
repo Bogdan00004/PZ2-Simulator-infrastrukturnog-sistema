@@ -5,20 +5,242 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MeteringSimulator"
         mc:Ignorable="d"
-        Title="Metering Simulator" Height="350" Width="525" WindowStyle="None" MouseLeftButtonDown="Window_MouseLeftButtonDown">
-    <Grid Background="Black">
-        <DockPanel>
-            <StackPanel DockPanel.Dock="Top" Orientation="Vertical">
-                <TextBlock Text="Metering Simulator" Foreground="White" FontSize="18" FontFamily="Consolas"/>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Background="Black" Margin="5">
-                    <ComboBox Name="ProjectTopics" Width="70"/>
-                    <Button Name="StartButton" Margin="5,0,0,0" Content="Start" Foreground="White" Width="100" Background="Black" BorderBrush="White" Click="StartButton_Click"/>
-                    <Separator Margin="5,0,0,0" Foreground="White"/>
-                    <Button Name="RestartButton" Margin="5,0,0,0" Content="Restart" Foreground="White" Width="100" Background="Black" BorderBrush="White" Click="RestartButton_Click"/>
-                    <Button Name="CloseButton" Margin="5,0,0,0" Content="Exit" Foreground="White" Width="100" BorderBrush="White" Background="Black" Click="CloseButton_Click"/>
-                </StackPanel>
-            </StackPanel>
-            <TextBox DockPanel.Dock="Top" x:Name="textBox" TextWrapping="Wrap" Text="" IsReadOnly="True" Background="{x:Null}" BorderBrush="{x:Null}" CaretBrush="White" Foreground="White"/>
-        </DockPanel>
-    </Grid>
+        Title="Metering Simulator"
+        Height="380" Width="520"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        MouseLeftButtonDown="Window_MouseLeftButtonDown">
+
+    <Border Background="#0D1117"
+            BorderBrush="#30363D"
+            BorderThickness="1"
+            CornerRadius="8">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="42"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="28"/>
+            </Grid.RowDefinitions>
+
+            <!-- TITLE BAR -->
+            <Border Grid.Row="0"
+                    Background="#161B22"
+                    CornerRadius="8,8,0,0">
+                <Grid Margin="14,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Ellipse Width="10" Height="10"
+                                 Fill="#3FB950"
+                                 Margin="0,0,8,0"/>
+                        <TextBlock Text="METERING SIMULATOR"
+                                   Foreground="#E6EDF3"
+                                   FontFamily="Consolas"
+                                   FontSize="13"
+                                   FontWeight="Bold"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <Button Grid.Column="1"
+                            Name="CloseButton"
+                            Width="28" Height="28"
+                            Click="CloseButton_Click"
+                            ToolTip="Close"
+                            Cursor="Hand">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="Bd"
+                                        Background="Transparent"
+                                        CornerRadius="4"
+                                        Width="28" Height="28">
+                                    <TextBlock Text="✕"
+                                               Foreground="#6E7681"
+                                               FontSize="14"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="Bd" Property="Background" Value="#DA3633"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                </Grid>
+            </Border>
+
+            <!-- SEPARATOR -->
+            <Rectangle Grid.Row="0"
+                       Height="1"
+                       Fill="#30363D"
+                       VerticalAlignment="Bottom"/>
+
+            <!-- CONTROLS -->
+            <Border Grid.Row="1"
+                    Background="#161B22"
+                    Padding="14,10">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Topic selector -->
+                    <StackPanel Grid.Column="0"
+                                Orientation="Horizontal"
+                                VerticalAlignment="Center">
+                        <TextBlock Text="TOPIC"
+                                   FontFamily="Consolas"
+                                   FontSize="10"
+                                   Foreground="#6E7681"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,8,0"/>
+                        <ComboBox Name="ProjectTopics"
+                                  Width="65"
+                                  Height="28"
+                                  FontFamily="Consolas"
+                                  FontSize="12"/>
+                    </StackPanel>
+
+                    <!-- Start button -->
+                    <Button Grid.Column="2"
+                            Name="StartButton"
+                            Content="▶  START"
+                            Width="100" Height="28"
+                            Margin="8,0,0,0"
+                            Cursor="Hand"
+                            Click="StartButton_Click">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="Bd"
+                                        Background="#238636"
+                                        BorderBrush="#2EA043"
+                                        BorderThickness="1"
+                                        CornerRadius="4"
+                                        Padding="10,0">
+                                    <ContentPresenter HorizontalAlignment="Center"
+                                                      VerticalAlignment="Center"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="Bd" Property="Background" Value="#2EA043"/>
+                                    </Trigger>
+                                    <Trigger Property="IsEnabled" Value="False">
+                                        <Setter TargetName="Bd" Property="Opacity" Value="0.4"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                        <Button.Foreground>
+                            <SolidColorBrush Color="#E6EDF3"/>
+                        </Button.Foreground>
+                        <Button.FontFamily>
+                            <FontFamily>Consolas</FontFamily>
+                        </Button.FontFamily>
+                        <Button.FontSize>11</Button.FontSize>
+                    </Button>
+
+                    <!-- Restart button -->
+                    <Button Grid.Column="3"
+                            Name="RestartButton"
+                            Content="↺  RESTART"
+                            Width="100" Height="28"
+                            Margin="8,0,0,0"
+                            Cursor="Hand"
+                            Click="RestartButton_Click">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="Bd"
+                                        Background="#21262D"
+                                        BorderBrush="#30363D"
+                                        BorderThickness="1"
+                                        CornerRadius="4"
+                                        Padding="10,0">
+                                    <ContentPresenter HorizontalAlignment="Center"
+                                                      VerticalAlignment="Center"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="Bd" Property="Background" Value="#30363D"/>
+                                    </Trigger>
+                                    <Trigger Property="IsEnabled" Value="False">
+                                        <Setter TargetName="Bd" Property="Opacity" Value="0.4"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                        <Button.Foreground>
+                            <SolidColorBrush Color="#E6EDF3"/>
+                        </Button.Foreground>
+                        <Button.FontFamily>
+                            <FontFamily>Consolas</FontFamily>
+                        </Button.FontFamily>
+                        <Button.FontSize>11</Button.FontSize>
+                    </Button>
+                </Grid>
+            </Border>
+
+            <!-- SEPARATOR -->
+            <Rectangle Grid.Row="1"
+                       Height="1"
+                       Fill="#30363D"
+                       VerticalAlignment="Bottom"/>
+
+            <!-- TERMINAL OUTPUT -->
+            <Border Grid.Row="2" Padding="14,10">
+                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled">
+                    <TextBox x:Name="textBox"
+                             TextWrapping="Wrap"
+                             IsReadOnly="True"
+                             Background="Transparent"
+                             BorderThickness="0"
+                             CaretBrush="#3FB950"
+                             Foreground="#3FB950"
+                             FontFamily="Consolas"
+                             FontSize="11"
+                             SelectionBrush="#30363D"/>
+                </ScrollViewer>
+            </Border>
+
+            <!-- STATUS BAR -->
+            <Border Grid.Row="3"
+                    Background="#161B22"
+                    CornerRadius="0,0,8,8"
+                    Padding="14,0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Rectangle Grid.Row="0"
+                               Height="1"
+                               Fill="#30363D"
+                               VerticalAlignment="Top"/>
+
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Ellipse Width="6" Height="6"
+                                 Fill="#3FB950"
+                                 Margin="0,0,6,0"/>
+                        <TextBlock Text="localhost:25675"
+                                   FontFamily="Consolas"
+                                   FontSize="10"
+                                   Foreground="#6E7681"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+        </Grid>
+    </Border>
 </Window>

@@ -77,7 +77,10 @@
     <Compile Include="Helpers\ToastNotificationService.cs" />
     <Compile Include="Helpers\ValidationBase.cs" />
     <Compile Include="Helpers\ValidationErrors.cs" />
+    <Compile Include="Model\CanvasSlot.cs" />
+    <Compile Include="Model\EntityConnection.cs" />
     <Compile Include="Model\PressureGauge.cs" />
+    <Compile Include="Model\PressureGaugeGroup.cs" />
     <Compile Include="Model\PressureGaugeType.cs" />
     <Compile Include="Model\SavedSearch.cs" />
     <Compile Include="ViewModel\BindableBase.cs" />
