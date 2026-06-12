@@ -9,7 +9,7 @@
             <RowDefinition Height="52"/>
             <!-- Header -->
             <RowDefinition Height="Auto"/>
-            <!-- Toolbar -->
+            <!-- Toolbar (two cards) -->
             <RowDefinition Height="*"/>
             <!-- DataGrid -->
             <RowDefinition Height="48"/>
@@ -41,59 +41,74 @@
                                Foreground="{StaticResource UIBorderColor}"
                                VerticalAlignment="Center"/>
                 </StackPanel>
-
                 <Border Grid.Column="1"
                         Background="{StaticResource UIPrimaryColor}"
                         BorderBrush="{StaticResource UIBorderColor}"
                         BorderThickness="1"
                         CornerRadius="4"
-                        Padding="10,4">
-                    <StackPanel Orientation="Horizontal">
-                        <fa:ImageAwesome Icon="Sliders"
-                                         Foreground="{StaticResource UIBorderColor}"
-                                         Width="12" Height="12"
-                                         Margin="0,0,7,0"/>
-                        <TextBlock Text="Valid range: 5 — 16 MPa"
-                                   FontSize="11"
-                                   Foreground="{StaticResource UIBorderColor}"/>
+                        Padding="12,6"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Right">
+                      <StackPanel Orientation="Horizontal"
+                                VerticalAlignment="Center">
+                           <fa:ImageAwesome Icon="Sliders"
+                                Foreground="{StaticResource UIAccentColor}"
+                                Width="12" Height="12"
+                                Margin="0,0,8,0"
+                                VerticalAlignment="Center"/>
+                              <TextBlock Text="Valid range:"
+                                    FontSize="11"
+                                    Foreground="{StaticResource UIBorderColor}"
+                                    VerticalAlignment="Center"
+                                    Margin="0,0,5,0"/>
+                              <TextBlock Text="5 – 16 MPa"
+                                    FontSize="11"
+                                    FontWeight="SemiBold"
+                                    Foreground="{StaticResource UITextColor}"
+                                    VerticalAlignment="Center"/>
                     </StackPanel>
                 </Border>
             </Grid>
         </Border>
 
-        <!-- ===== TOOLBAR (two rows) ===== -->
+        <!-- ===== TOOLBAR: two panels ===== -->
         <Border Grid.Row="1"
                 Background="{StaticResource UISecondaryColor}"
                 BorderBrush="{StaticResource UIBorderColor}"
                 BorderThickness="0,0,0,1"
-                Padding="16,10">
+                Padding="16">
             <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="8"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="290"/>
+                    <ColumnDefinition Width="14"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
 
-                <!-- ROW 1: Add entity + Search input -->
-                <Grid Grid.Row="0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <!-- Add section -->
-                        <ColumnDefinition Width="20"/>
-                        <!-- Gap -->
-                        <ColumnDefinition Width="1"/>
-                        <!-- Separator -->
-                        <ColumnDefinition Width="20"/>
-                        <!-- Gap -->
-                        <ColumnDefinition Width="*"/>
-                        <!-- Search section -->
-                    </Grid.ColumnDefinitions>
+                <!-- ============ PANEL 1: ADD ENTITY ============ -->
+                <Border Grid.Column="0"
+                        Background="{StaticResource UIPrimaryColor}"
+                        BorderBrush="{StaticResource UIBorderColor}"
+                        BorderThickness="1"
+                        CornerRadius="6"
+                        Padding="14">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <fa:ImageAwesome Icon="PlusCircle"
+                                             Foreground="{StaticResource UIAccentColor}"
+                                             Width="13" Height="13"
+                                             Margin="0,0,8,0"/>
+                            <TextBlock Text="ADD NEW ENTITY"
+                                       FontSize="11"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource UIAccentColor}"/>
+                        </StackPanel>
 
-                    <!-- Add entity (CG1: type only) -->
-                    <StackPanel Grid.Column="0"
-                                Orientation="Horizontal"
-                                VerticalAlignment="Center">
-                        <ComboBox Width="195" Height="32"
+                        <TextBlock Text="Entity type"
+                                   FontSize="11"
+                                   Foreground="{StaticResource UIBorderColor}"
+                                   Margin="0,0,0,5"/>
+
+                        <ComboBox Height="34"
                                   ItemsSource="{Binding AvailableTypes}"
                                   SelectedItem="{Binding SelectedTypeToAdd}"
                                   ToolTip="Select entity type to add">
@@ -106,119 +121,172 @@
                                                          Margin="0,0,8,0"
                                                          VerticalAlignment="Center"/>
                                         <TextBlock Text="{Binding Name}"
+                                                   Foreground="{StaticResource UITextColor}"
                                                    VerticalAlignment="Center"/>
                                     </StackPanel>
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
                         </ComboBox>
 
-                        <Button Height="32" Margin="8,0,0,0"
+                        <!-- Validation message -->
+                        <TextBlock Text="{Binding TypeValidationError}"
+                                   FontSize="11"
+                                   Foreground="{StaticResource UIDangerColor}"
+                                   Margin="2,5,0,0"
+                                   TextWrapping="Wrap"
+                                   Visibility="{Binding HasTypeValidationError,
+                                                Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+                        <Button Height="34"
+                                Margin="0,12,0,0"
+                                HorizontalAlignment="Stretch"
                                 Command="{Binding AddCommand}"
                                 ToolTip="Add new entity — ID and name are auto-generated (CG1)">
-                            <StackPanel Orientation="Horizontal" Margin="4,0">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                 <fa:ImageAwesome Icon="PlusCircle"
                                                  Foreground="White"
                                                  Width="13" Height="13"
-                                                 Margin="0,0,6,0"/>
+                                                 Margin="0,0,7,0"/>
                                 <TextBlock Text="Add Entity" Foreground="White"/>
                             </StackPanel>
                         </Button>
-                    </StackPanel>
 
-                    <!-- Vertical separator -->
-                    <Rectangle Grid.Column="2"
-                               Fill="{StaticResource UIBorderColor}"/>
-
-                    <!-- Search (P1) -->
-                    <StackPanel Grid.Column="4"
-                                Orientation="Horizontal"
-                                VerticalAlignment="Center">
-                        <fa:ImageAwesome Icon="Search"
-                                         Foreground="{StaticResource UIBorderColor}"
-                                         Width="13" Height="13"
-                                         Margin="0,0,10,0"/>
-                        <RadioButton Content="By Name"
-                                     IsChecked="{Binding SearchByName}"
-                                     VerticalAlignment="Center"
-                                     ToolTip="Filter entities by name"/>
-                        <RadioButton Content="By Type"
-                                     IsChecked="{Binding SearchByType}"
-                                     VerticalAlignment="Center"
-                                     Margin="0,0,12,0"
-                                     ToolTip="Filter entities by type"/>
-                        <TextBox Width="220" Height="32"
-                                 Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
-                                 ToolTip="Type to filter entities in real-time"/>
-                    </StackPanel>
-                </Grid>
-
-                <!-- ROW 2: Saved searches (CG1) -->
-                <Grid Grid.Row="2">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-
-                    <!-- Label -->
-                    <StackPanel Grid.Column="0"
-                                Orientation="Horizontal"
-                                VerticalAlignment="Center"
-                                Margin="0,0,10,0">
-                        <fa:ImageAwesome Icon="Bookmark"
-                                         Foreground="{StaticResource UIBorderColor}"
-                                         Width="12" Height="12"
-                                         Margin="0,0,7,0"/>
-                        <TextBlock Text="Saved searches:"
-                                   FontSize="11"
+                        <TextBlock Text="ID and name are generated automatically."
+                                   FontSize="10"
                                    Foreground="{StaticResource UIBorderColor}"
-                                   VerticalAlignment="Center"/>
+                                   Opacity="0.7"
+                                   Margin="2,8,0,0"
+                                   TextWrapping="Wrap"/>
                     </StackPanel>
+                </Border>
 
-                    <!-- Saved searches ComboBox -->
-                    <ComboBox Grid.Column="1"
-                              Height="30"
-                              Margin="0,0,8,0"
-                              ItemsSource="{Binding SavedSearches}"
-                              SelectedItem="{Binding SelectedSavedSearch}"
-                              IsEnabled="{Binding SavedSearches.Count,
-                                          Converter={StaticResource CountToBoolConverter}}"
-                              ToolTip="Select a saved search to load it (CG1)"/>
+                <!-- ============ PANEL 2: SEARCH & FILTER (P1) ============ -->
+                <Border Grid.Column="2"
+                        Background="{StaticResource UIPrimaryColor}"
+                        BorderBrush="{StaticResource UIBorderColor}"
+                        BorderThickness="1"
+                        CornerRadius="6"
+                        Padding="14">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="10"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
 
-                    <!-- Save + Clear buttons -->
-                    <StackPanel Grid.Column="2"
-                                Orientation="Horizontal">
-                        <Button Height="30"
-                                Margin="0,0,6,0"
-                                Command="{Binding SaveSearchCommand}"
-                                ToolTip="Save current search criteria for later use (CG1)">
-                            <StackPanel Orientation="Horizontal" Margin="6,0">
-                                <fa:ImageAwesome Icon="Download"
-                                                 Foreground="White"
-                                                 Width="12" Height="12"
-                                                 Margin="0,0,6,0"/>
-                                <TextBlock Text="Save search" Foreground="White" FontSize="12"/>
+                        <!-- Title -->
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
+                            <fa:ImageAwesome Icon="Search"
+                                             Foreground="{StaticResource UIAccentColor}"
+                                             Width="13" Height="13"
+                                             Margin="0,0,8,0"/>
+                            <TextBlock Text="SEARCH AND FILTER (P1)"
+                                       FontSize="11"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource UIAccentColor}"/>
+                        </StackPanel>
+
+                        <!-- Row 1: criteria + text -->
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" Orientation="Vertical">
+                                <TextBlock Text="Search by"
+                                           FontSize="11"
+                                           Foreground="{StaticResource UIBorderColor}"
+                                           Margin="0,0,0,5"/>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <RadioButton Content="Name"
+                                                 IsChecked="{Binding SearchByName}"
+                                                 VerticalAlignment="Center"
+                                                 ToolTip="Filter entities by name"/>
+                                    <RadioButton Content="Type"
+                                                 IsChecked="{Binding SearchByType}"
+                                                 VerticalAlignment="Center"
+                                                 ToolTip="Filter entities by type"/>
+                                </StackPanel>
                             </StackPanel>
-                        </Button>
 
-                        <Button Height="30"
-                                Command="{Binding ClearSearchCommand}"
-                                ToolTip="Clear search and show all entities">
-                            <StackPanel Orientation="Horizontal" Margin="6,0">
-                                <fa:ImageAwesome Icon="TimesCircle"
-                                                 Foreground="White"
-                                                 Width="12" Height="12"
-                                                 Margin="0,0,6,0"/>
-                                <TextBlock Text="Clear" Foreground="White" FontSize="12"/>
+                            <StackPanel Grid.Column="2" Orientation="Vertical">
+                                <TextBlock Text="Search term"
+                                           FontSize="11"
+                                           Foreground="{StaticResource UIBorderColor}"
+                                           Margin="0,0,0,5"/>
+                                <TextBox Height="34"
+                                         Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                                         ToolTip="Type to filter entities in real-time"/>
                             </StackPanel>
-                        </Button>
-                    </StackPanel>
-                </Grid>
+                        </Grid>
+
+                        <!-- Row 2: saved searches -->
+                        <Grid Grid.Row="3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="10"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="8"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" Orientation="Vertical">
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                    <fa:ImageAwesome Icon="Bookmark"
+                                                     Foreground="{StaticResource UIBorderColor}"
+                                                     Width="11" Height="11"
+                                                     Margin="0,0,6,0"/>
+                                    <TextBlock Text="Saved searches (CG1)"
+                                               FontSize="11"
+                                               Foreground="{StaticResource UIBorderColor}"/>
+                                </StackPanel>
+                                <ComboBox Height="34"
+                                          ItemsSource="{Binding SavedSearches}"
+                                          SelectedItem="{Binding SelectedSavedSearch}"
+                                          IsEnabled="{Binding SavedSearches.Count,
+                                                      Converter={StaticResource CountToBoolConverter}}"
+                                          ToolTip="Select a saved search to load it"/>
+                            </StackPanel>
+
+                            <Button Grid.Column="2"
+                                    Width="120" Height="34"
+                                    VerticalAlignment="Bottom"
+                                    Command="{Binding SaveSearchCommand}"
+                                    ToolTip="Save current search criteria for later use (CG1)">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <fa:ImageAwesome Icon="Download"
+                                                     Foreground="White"
+                                                     Width="12" Height="12"
+                                                     Margin="0,0,6,0"/>
+                                    <TextBlock Text="Save search" Foreground="White" FontSize="12"/>
+                                </StackPanel>
+                            </Button>
+
+                            <Button Grid.Column="4"
+                                    Width="90" Height="34"
+                                    VerticalAlignment="Bottom"
+                                    Command="{Binding ClearSearchCommand}"
+                                    ToolTip="Clear search and show all entities">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <fa:ImageAwesome Icon="TimesCircle"
+                                                     Foreground="White"
+                                                     Width="12" Height="12"
+                                                     Margin="0,0,6,0"/>
+                                    <TextBlock Text="Clear" Foreground="White" FontSize="12"/>
+                                </StackPanel>
+                            </Button>
+                        </Grid>
+                    </Grid>
+                </Border>
             </Grid>
         </Border>
 
         <!-- ===== DATA GRID ===== -->
         <DataGrid Grid.Row="2"
+                  Margin="16,12,16,12"
                   ItemsSource="{Binding EntitiesView}"
                   SelectedItem="{Binding SelectedEntity}"
                   AutoGenerateColumns="False"
@@ -227,7 +295,10 @@
                   CanUserReorderColumns="False"
                   CanUserResizeRows="False"
                   HeadersVisibility="Column"
-                  RowHeight="40">
+                  GridLinesVisibility="Horizontal"
+                  BorderThickness="1"
+                  BorderBrush="{StaticResource UIBorderColor}"
+                  RowHeight="42">
 
             <DataGrid.Columns>
 
@@ -403,6 +474,5 @@
                 </Button>
             </Grid>
         </Border>
-
     </Grid>
 </UserControl>

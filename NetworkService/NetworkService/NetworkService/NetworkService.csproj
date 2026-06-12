@@ -73,6 +73,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Helpers\BoolToVisibilityConverter.cs" />
     <Compile Include="Helpers\CountToBoolConverter.cs" />
     <Compile Include="Helpers\ToastNotificationService.cs" />
     <Compile Include="Helpers\ValidationBase.cs" />

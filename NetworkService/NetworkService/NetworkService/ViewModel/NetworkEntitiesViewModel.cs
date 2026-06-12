@@ -13,9 +13,7 @@ namespace NetworkService.ViewModel
     {
         private readonly ICollectionView _entitiesView;
 
-        // =============================================
         // Search properties
-        // =============================================
         private bool _searchByName = true;
         private bool _searchByType;
         private string _searchText = string.Empty;
@@ -51,11 +49,9 @@ namespace NetworkService.ViewModel
             }
         }
 
-        // =============================================
         // Saved searches (CG1)
-        // =============================================
-        public ObservableCollection<SavedSearch> SavedSearches { get; }
-            = new ObservableCollection<SavedSearch>();
+      
+        public ObservableCollection<SavedSearch> SavedSearches { get; } = new ObservableCollection<SavedSearch>();
 
         private SavedSearch _selectedSavedSearch;
         public SavedSearch SelectedSavedSearch
@@ -68,9 +64,8 @@ namespace NetworkService.ViewModel
             }
         }
 
-        // =============================================
         // Add entity properties (CG1: type only)
-        // =============================================
+
         private PressureGaugeType _selectedTypeToAdd;
         public PressureGaugeType SelectedTypeToAdd
         {
@@ -78,15 +73,27 @@ namespace NetworkService.ViewModel
             set
             {
                 SetProperty(ref _selectedTypeToAdd, value);
-                AddCommand.RaiseCanExecuteChanged();
+                if (value != null)
+                    TypeValidationError = string.Empty;
             }
         }
 
+        private string _typeValidationError = string.Empty;
+        public string TypeValidationError
+        {
+            get => _typeValidationError;
+            set
+            {
+                SetProperty(ref _typeValidationError, value);
+                OnPropertyChanged(nameof(HasTypeValidationError));
+            }
+        }
+
+        public bool HasTypeValidationError => !string.IsNullOrEmpty(TypeValidationError);
+
         public List<PressureGaugeType> AvailableTypes => PressureGaugeType.PredefinedTypes;
 
-        // =============================================
         // Selected entity (for delete)
-        // =============================================
         private PressureGauge _selectedEntity;
         public PressureGauge SelectedEntity
         {
@@ -98,36 +105,34 @@ namespace NetworkService.ViewModel
             }
         }
 
-        // =============================================
         // Filtered view
-        // =============================================
+       
         public ICollectionView EntitiesView => _entitiesView;
 
-        // =============================================
+       
         // Commands
-        // =============================================
+        
         public MyICommand AddCommand { get; }
         public MyICommand DeleteCommand { get; }
         public MyICommand SaveSearchCommand { get; }
         public MyICommand ClearSearchCommand { get; }
 
-        // =============================================
+        
         // Constructor
-        // =============================================
+        
         public NetworkEntitiesViewModel()
         {
             _entitiesView = CollectionViewSource.GetDefaultView(MainWindowViewModel.Entities);
             _entitiesView.Filter = FilterEntity;
 
-            AddCommand = new MyICommand(OnAdd, CanAdd);
+            AddCommand = new MyICommand(OnAdd);
             DeleteCommand = new MyICommand(OnDelete, CanDelete);
             SaveSearchCommand = new MyICommand(OnSaveSearch, CanSaveSearch);
             ClearSearchCommand = new MyICommand(OnClearSearch);
         }
 
-        // =============================================
         // Filter logic (P1)
-        // =============================================
+        
         private bool FilterEntity(object obj)
         {
             if (!(obj is PressureGauge entity)) return false;
@@ -146,16 +151,16 @@ namespace NetworkService.ViewModel
 
         private void ApplyFilter() => _entitiesView.Refresh();
 
-        // =============================================
         // Add entity (CG1: auto-generate ID and Name)
-        // =============================================
-        private bool CanAdd() => SelectedTypeToAdd != null;
-
         private void OnAdd()
         {
-            int newId = MainWindowViewModel.Entities.Any()
-                            ? MainWindowViewModel.Entities.Max(e => e.Id) + 1
-                            : 1;
+            if (SelectedTypeToAdd == null)
+            {
+                TypeValidationError = "Please select an entity type before adding.";
+                return;
+            }
+
+            int newId = MainWindowViewModel.Entities.Any() ? MainWindowViewModel.Entities.Max(e => e.Id) + 1 : 1;
             string newName = $"PG-VALVE-{newId:D3}";
 
             var newEntity = new PressureGauge
@@ -168,17 +173,11 @@ namespace NetworkService.ViewModel
             MainWindowViewModel.Entities.Add(newEntity);
             _entitiesView.Refresh();
 
-            ToastNotificationService.ShowSuccess(
-                "Entity Added",
-                $"'{newName}' (ID: {newId}) added successfully."
-            );
+            ToastNotificationService.ShowSuccess("Entity Added",$"'{newName}' (ID: {newId}) added successfully.");
 
             MainWindowViewModel.RestartSimulator();
         }
-
-        // =============================================
         // Delete entity
-        // =============================================
         private bool CanDelete() => SelectedEntity != null;
 
         private void OnDelete()
@@ -210,9 +209,7 @@ namespace NetworkService.ViewModel
             MainWindowViewModel.RestartSimulator();
         }
 
-        // =============================================
         // Save search (CG1)
-        // =============================================
         private bool CanSaveSearch() => !string.IsNullOrWhiteSpace(SearchText);
 
         private void OnSaveSearch()
@@ -223,24 +220,16 @@ namespace NetworkService.ViewModel
                 SearchText = SearchText
             };
 
-            bool alreadyExists = SavedSearches.Any(
-                s => s.SearchBy == search.SearchBy && s.SearchText == search.SearchText
-            );
+            bool alreadyExists = SavedSearches.Any(s => s.SearchBy == search.SearchBy && s.SearchText == search.SearchText);
 
             if (!alreadyExists)
             {
                 SavedSearches.Add(search);
-                ToastNotificationService.ShowSuccess(
-                    "Search Saved",
-                    $"Search '{search}' saved successfully."
-                );
+                ToastNotificationService.ShowSuccess("Search Saved",$"Search '{search}' saved successfully.");
             }
             else
             {
-                ToastNotificationService.ShowWarning(
-                    "Already Saved",
-                    "This search is already in the saved list."
-                );
+                ToastNotificationService.ShowWarning("Already Saved", "This search is already in the saved list.");
             }
         }
 
@@ -251,9 +240,8 @@ namespace NetworkService.ViewModel
             SearchText = search.SearchText;
         }
 
-        // =============================================
         // Clear search
-        // =============================================
+       
         private void OnClearSearch()
         {
             SearchText = string.Empty;

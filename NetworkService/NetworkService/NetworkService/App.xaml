@@ -8,7 +8,7 @@
 
         <!-- Converters -->
         <helpers:CountToBoolConverter x:Key="CountToBoolConverter"/>
-
+        <helpers:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
         <!-- COLOR PALETTE -->
         <SolidColorBrush x:Key="UIPrimaryColor"     Color="#1E2328"/>
         <SolidColorBrush x:Key="UISecondaryColor"   Color="#2C3138"/>
