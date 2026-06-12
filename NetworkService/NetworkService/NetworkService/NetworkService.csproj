@@ -79,6 +79,7 @@
     <Compile Include="Helpers\ValidationErrors.cs" />
     <Compile Include="Model\CanvasSlot.cs" />
     <Compile Include="Model\EntityConnection.cs" />
+    <Compile Include="Model\MeasurementRecord.cs" />
     <Compile Include="Model\PressureGauge.cs" />
     <Compile Include="Model\PressureGaugeGroup.cs" />
     <Compile Include="Model\PressureGaugeType.cs" />
@@ -150,8 +151,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Resources\Images\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

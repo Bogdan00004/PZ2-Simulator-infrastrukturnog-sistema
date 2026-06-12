@@ -1,4 +1,6 @@
 ﻿using NetworkService.Helpers;
+using System;
+using System.Collections.ObjectModel;
 
 namespace NetworkService.Model
 {
@@ -44,6 +46,28 @@ namespace NetworkService.Model
                 OnPropertyChanged(nameof(ValueDisplay));
                 OnPropertyChanged(nameof(StatusText));
             }
+        }
+
+        // Measurement history — last 5 readings
+
+        public ObservableCollection<MeasurementRecord> History { get; }
+            = new ObservableCollection<MeasurementRecord>();
+
+        public const int MaxHistorySize = 5;
+
+        public void RecordMeasurement(double value, DateTime timestamp)
+        {
+            CurrentValue = value;
+
+            History.Add(new MeasurementRecord
+            {
+                Value = value,
+                Timestamp = timestamp,
+                IsValid = IsValueValid
+            });
+
+            while (History.Count > MaxHistorySize)
+                History.RemoveAt(0);
         }
 
         public string TypeName => _type?.Name ?? "Unknown";

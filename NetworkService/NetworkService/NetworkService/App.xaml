@@ -37,6 +37,21 @@
             <Setter Property="Foreground" Value="{StaticResource UITextColor}"/>
             <Setter Property="FontFamily" Value="Segoe UI"/>
         </Style>
+        <Style TargetType="ComboBoxItem">
+            <Setter Property="Background"  Value="{StaticResource UISecondaryColor}"/>
+            <Setter Property="Foreground"  Value="{StaticResource UITextColor}"/>
+            <Setter Property="Padding"     Value="8,5"/>
+            <Setter Property="FontFamily"  Value="Segoe UI"/>
+            <Setter Property="FontSize"    Value="13"/>
+            <Style.Triggers>
+                <Trigger Property="IsHighlighted" Value="True">
+                    <Setter Property="Background" Value="{StaticResource UIAccentColor}"/>
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="{StaticResource UIHoverColor}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
 
         <Style TargetType="Button">
             <Setter Property="Background"      Value="{StaticResource UIAccentColor}"/>
@@ -87,9 +102,86 @@
             <Setter Property="Foreground"      Value="{StaticResource UITextColor}"/>
             <Setter Property="BorderBrush"     Value="{StaticResource UIBorderColor}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding"         Value="6,4"/>
+            <Setter Property="Padding"         Value="8,4"/>
             <Setter Property="FontFamily"      Value="Segoe UI"/>
             <Setter Property="FontSize"        Value="13"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <!-- Closed-state chrome -->
+                            <ToggleButton x:Name="ToggleButton"
+                                  Focusable="False"
+                                  ClickMode="Press"
+                                  IsChecked="{Binding IsDropDownOpen, Mode=TwoWay,
+                                              RelativeSource={RelativeSource TemplatedParent}}">
+                                <ToggleButton.Template>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <Border Background="{StaticResource UISecondaryColor}"
+                                        BorderBrush="{StaticResource UIBorderColor}"
+                                        BorderThickness="1"
+                                        CornerRadius="4">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="26"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Path Grid.Column="1"
+                                              Data="M 0 0 L 4 4 L 8 0 Z"
+                                              Fill="{StaticResource UIBorderColor}"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="{StaticResource UIHoverColor}"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                            </ToggleButton>
+
+                            <!-- Selected item content -->
+                            <ContentPresenter x:Name="ContentSite"
+                                      IsHitTestVisible="False"
+                                      Content="{TemplateBinding SelectionBoxItem}"
+                                      ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                      ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                      Margin="10,0,28,0"
+                                      VerticalAlignment="Center"
+                                      HorizontalAlignment="Left"
+                                      TextElement.Foreground="{StaticResource UITextColor}"/>
+
+                            <!-- Dropdown popup -->
+                            <Popup x:Name="Popup"
+                           Placement="Bottom"
+                           IsOpen="{TemplateBinding IsDropDownOpen}"
+                           AllowsTransparency="True"
+                           Focusable="False"
+                           PopupAnimation="Slide">
+                                <Border Background="{StaticResource UISecondaryColor}"
+                                BorderBrush="{StaticResource UIAccentColor}"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}"
+                                MaxHeight="{TemplateBinding MaxDropDownHeight}"
+                                Margin="0,2,0,0">
+                                    <ScrollViewer SnapsToDevicePixels="True">
+                                        <ItemsPresenter/>
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.4"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
 
         <Style TargetType="RadioButton">

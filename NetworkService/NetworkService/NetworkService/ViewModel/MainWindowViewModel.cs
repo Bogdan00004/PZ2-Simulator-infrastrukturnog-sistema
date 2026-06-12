@@ -12,15 +12,12 @@ namespace NetworkService.ViewModel
 {
     public class MainWindowViewModel : BindableBase
     {
-        // =============================================
         // Shared entities — accessible by all ViewModels
-        // =============================================
         public static ObservableCollection<PressureGauge> Entities { get; private set; }
             = new ObservableCollection<PressureGauge>();
 
-        // =============================================
         // Navigation
-        // =============================================
+
         private BindableBase _currentViewModel;
         public BindableBase CurrentViewModel
         {
@@ -34,9 +31,8 @@ namespace NetworkService.ViewModel
         public NetworkDisplayViewModel NetworkDisplayViewModel { get; private set; }
         public MyICommand<string> NavigateCommand { get; private set; }
 
-        // =============================================
         // Status bar
-        // =============================================
+
         private string _lastUpdateTime = "—";
         private string _connectionStatus = "Waiting for simulator...";
 
@@ -54,11 +50,12 @@ namespace NetworkService.ViewModel
 
         public int EntityCount => Entities.Count;
 
-        // =============================================
         // Constructor
-        // =============================================
+
         public MainWindowViewModel()
         {
+            KillStaleSimulatorProcesses();
+
             InitializeSampleEntities();
 
             _networkEntitiesViewModel = new NetworkEntitiesViewModel();
@@ -71,11 +68,30 @@ namespace NetworkService.ViewModel
             Entities.CollectionChanged += (s, e) => OnPropertyChanged(nameof(EntityCount));
 
             InitializeTcpListener();
+            StartSimulator();
         }
 
-        // =============================================
-        // Navigation (CG1: Entities ↔ Graph)
-        // =============================================
+        // Ensure a clean start — kill leftover simulator
+        // instances from a previous session
+     
+        private static void KillStaleSimulatorProcesses()
+        {
+            try
+            {
+                foreach (var process in
+                    System.Diagnostics.Process.GetProcessesByName("MeteringSimulator"))
+                {
+                    process.Kill();
+                    process.WaitForExit();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Startup Cleanup Error] {ex.Message}");
+            }
+        }
+
+        // Navigation (CG1: Entities <-> Graph)
         private void OnNavigate(string destination)
         {
             switch (destination)
@@ -89,9 +105,7 @@ namespace NetworkService.ViewModel
             }
         }
 
-        // =============================================
         // Pre-created sample entities (minimum 3)
-        // =============================================
         private void InitializeSampleEntities()
         {
             var cableSensor = PressureGaugeType.PredefinedTypes[0];
@@ -120,9 +134,7 @@ namespace NetworkService.ViewModel
             });
         }
 
-        // =============================================
         // TCP Listener
-        // =============================================
         private void InitializeTcpListener()
         {
             var tcp = new TcpListener(IPAddress.Any, 25675);
@@ -166,10 +178,8 @@ namespace NetworkService.ViewModel
             listeningThread.Start();
         }
 
-        // =============================================
         // Process incoming measurement
         // Format: "Entitet_N:value"
-        // =============================================
         private void ProcessMeasurement(string message)
         {
             try
@@ -183,9 +193,9 @@ namespace NetworkService.ViewModel
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     if (entityIndex < 0 || entityIndex >= Entities.Count) return;
-
-                    Entities[entityIndex].CurrentValue = value;
-                    LastUpdateTime = DateTime.Now.ToString("HH:mm:ss");
+                    var timestamp = DateTime.Now;
+                    Entities[entityIndex].RecordMeasurement(value, timestamp);
+                    LastUpdateTime = timestamp.ToString("HH:mm:ss");
                     ConnectionStatus = "Connected";
 
                     WriteToLog(Entities[entityIndex], value);
@@ -197,9 +207,27 @@ namespace NetworkService.ViewModel
             }
         }
 
-        // =============================================
+        // Launch the simulator (used on first startup —
+        // no existing process to kill at this point)
+        
+        private static void StartSimulator()
+        {
+            try
+            {
+                string simulatorPath = FindSimulatorExecutable();
+
+                if (simulatorPath != null)
+                    System.Diagnostics.Process.Start(simulatorPath);
+                else
+                    Console.WriteLine("[Simulator] MeteringSimulator.exe not found.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Simulator Start Error] {ex.Message}");
+            }
+        }
+
         // Simulator restart — called after add/delete
-        // =============================================
         public static void RestartSimulator()
         {
             try
@@ -253,9 +281,7 @@ namespace NetworkService.ViewModel
             return null;
         }
 
-        // =============================================
         // Log file writer
-        // =============================================
         private static void WriteToLog(PressureGauge entity, double value)
         {
             try

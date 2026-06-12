@@ -7,7 +7,8 @@
         Height="820" Width="1400"
         MinHeight="700" MinWidth="1100"
         WindowStartupLocation="CenterScreen"
-        Background="{StaticResource UIPrimaryColor}">
+        Background="{StaticResource UIPrimaryColor}"
+        Closing="MainWindow_Closing">
 
     <Window.Resources>
         <DataTemplate DataType="{x:Type vm:NetworkEntitiesViewModel}">
@@ -117,7 +118,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- LEFT: Network Display (always visible — CG1) -->
+            <!-- Network Display (always visible — CG1) -->
             <Border Grid.Column="0"
                     Background="{StaticResource UISecondaryColor}"
                     BorderBrush="{StaticResource UIBorderColor}"
@@ -129,7 +130,7 @@
             <Rectangle Grid.Column="1"
                        Fill="{StaticResource UIBorderColor}"/>
 
-            <!-- RIGHT: Switchable content (Network Entities / Graph) -->
+            <!-- Switchable content (Network Entities / Graph) -->
             <ContentControl Grid.Column="2"
                             Content="{Binding CurrentViewModel}"/>
         </Grid>
@@ -166,7 +167,6 @@
                            HorizontalAlignment="Center"
                            VerticalAlignment="Center"/>
 
-                <!-- Last update -->
                 <StackPanel Grid.Column="2"
                             Orientation="Horizontal"
                             VerticalAlignment="Center">
