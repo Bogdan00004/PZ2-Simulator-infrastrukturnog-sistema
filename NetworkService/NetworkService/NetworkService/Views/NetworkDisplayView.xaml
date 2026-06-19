@@ -8,7 +8,6 @@
 
     <UserControl.Resources>
 
-        <!-- Shared slot DataTemplate -->
         <DataTemplate x:Key="SlotTemplate">
             <Border Margin="3" CornerRadius="6">
                 <Border.Style>
@@ -39,6 +38,39 @@
                 </Border.Style>
 
                 <Grid>
+                    <!-- OUT OF RANGE pulsing overlay animation -->
+                    <Border CornerRadius="5" IsHitTestVisible="False">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Opacity" Value="0"/>
+                                <Setter Property="Background">
+                                    <Setter.Value>
+                                        <SolidColorBrush Color="#C0392B"/>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Entity.StatusText}"
+                                            Value="OUT OF RANGE">
+                                        <DataTrigger.EnterActions>
+                                            <BeginStoryboard Name="PulseAnim">
+                                                <Storyboard RepeatBehavior="Forever"
+                                                        AutoReverse="True">
+                                                    <DoubleAnimation
+                                                        Storyboard.TargetProperty="Opacity"
+                                                        From="0" To="0.2"
+                                                           Duration="0:0:0.75"/>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </DataTrigger.EnterActions>
+                                        <DataTrigger.ExitActions>
+                                            <StopStoryboard BeginStoryboardName="PulseAnim"/>
+                                        </DataTrigger.ExitActions>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                    </Border>
+
                     <!-- EMPTY STATE -->
                     <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                         <StackPanel.Style>
@@ -99,7 +131,8 @@
                                     <Setter Property="BorderBrush" Value="Transparent"/>
                                     <Style.Triggers>
                                         <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="Background" Value="{StaticResource UIDangerColor}"/>
+                                            <Setter Property="Background"
+                                                    Value="{StaticResource UIDangerColor}"/>
                                         </Trigger>
                                     </Style.Triggers>
                                 </Style>
@@ -109,15 +142,15 @@
                                              Width="9" Height="9"/>
                         </Button>
 
-                        <!-- Entity info -->
+                        <!-- Entity info with actual PNG image -->
                         <StackPanel Grid.Row="0"
                                     VerticalAlignment="Center"
                                     HorizontalAlignment="Center"
                                     Margin="4,8,4,4">
-                            <fa:ImageAwesome Icon="{Binding Entity.Type.Icon, FallbackValue=Circle}"
-                                             Foreground="{Binding Entity.Type.IconBrush}"
-                                             Width="28" Height="28"
-                                             HorizontalAlignment="Center"/>
+                            <Image Source="{Binding Entity.Type.ImagePath}"
+                                   Width="32" Height="32"
+                                   HorizontalAlignment="Center"
+                                   RenderOptions.BitmapScalingMode="HighQuality"/>
                             <TextBlock Text="{Binding Entity.Name}"
                                        FontSize="10"
                                        FontWeight="SemiBold"
@@ -228,22 +261,21 @@
             </Grid>
         </Border>
 
-        <!-- TREE VIEW -->
+        <!-- TREE VIEW with PNG images -->
         <Border Grid.Row="1"
-        BorderBrush="{StaticResource UIBorderColor}"
-        BorderThickness="0,0,0,1"
-        MaxHeight="210">
+                BorderBrush="{StaticResource UIBorderColor}"
+                BorderThickness="0,0,0,1"
+                MaxHeight="210">
             <TreeView x:Name="EntitiesTreeView"
-              ItemsSource="{Binding TreeViewGroups}"
-              Background="{StaticResource UIPrimaryColor}"
-              BorderThickness="0"
-              SelectedItemChanged="TreeView_SelectedItemChanged"
-              MouseLeftButtonUp="TreeView_MouseLeftButtonUp"
-              PreviewMouseLeftButtonDown="TreeView_PreviewMouseLeftButtonDown"
-              PreviewMouseMove="TreeView_PreviewMouseMove"
-              Padding="4">
+                      ItemsSource="{Binding TreeViewGroups}"
+                      Background="{StaticResource UIPrimaryColor}"
+                      BorderThickness="0"
+                      SelectedItemChanged="TreeView_SelectedItemChanged"
+                      MouseLeftButtonUp="TreeView_MouseLeftButtonUp"
+                      PreviewMouseLeftButtonDown="TreeView_PreviewMouseLeftButtonDown"
+                      PreviewMouseMove="TreeView_PreviewMouseMove"
+                      Padding="4">
 
-                <!-- Auto-expand all groups -->
                 <TreeView.ItemContainerStyle>
                     <Style TargetType="TreeViewItem">
                         <Setter Property="IsExpanded" Value="True"/>
@@ -252,37 +284,42 @@
                 </TreeView.ItemContainerStyle>
 
                 <TreeView.Resources>
+                    <!-- Group template with PNG image -->
                     <HierarchicalDataTemplate DataType="{x:Type model:PressureGaugeGroup}"
-                                      ItemsSource="{Binding Entities}">
+                                              ItemsSource="{Binding Entities}">
                         <StackPanel Orientation="Horizontal" Margin="2,3">
-                            <fa:ImageAwesome Icon="{Binding TypeIcon}"
-                                     Foreground="{Binding TypeIconBrush}"
-                                     Width="14" Height="14"
-                                     Margin="0,0,7,0"/>
+                            <Image Source="{Binding TypeImagePath}"
+                                   Width="16" Height="16"
+                                   Margin="0,0,7,0"
+                                   VerticalAlignment="Center"
+                                   RenderOptions.BitmapScalingMode="HighQuality"/>
                             <TextBlock Text="{Binding TypeName}"
-                               FontWeight="SemiBold"
-                               FontSize="12"
-                               Foreground="{StaticResource UITextColor}"/>
+                                       FontWeight="SemiBold"
+                                       FontSize="12"
+                                       Foreground="{StaticResource UITextColor}"/>
                         </StackPanel>
                     </HierarchicalDataTemplate>
 
+                    <!-- Entity template with PNG image -->
                     <DataTemplate DataType="{x:Type model:PressureGauge}">
                         <StackPanel Orientation="Horizontal" Margin="2,2">
-                            <fa:ImageAwesome Icon="{Binding Type.Icon}"
-                                     Foreground="{Binding Type.IconBrush}"
-                                     Width="13" Height="13"
-                                     Margin="0,0,7,0"/>
+                            <Image Source="{Binding Type.ImagePath}"
+                                   Width="14" Height="14"
+                                   Margin="0,0,7,0"
+                                   VerticalAlignment="Center"
+                                   RenderOptions.BitmapScalingMode="HighQuality"/>
                             <TextBlock Text="{Binding Name}"
-                               FontSize="12"
-                               Foreground="{StaticResource UITextColor}"/>
+                                       FontSize="12"
+                                       Foreground="{StaticResource UITextColor}"/>
                             <TextBlock Text="{Binding Id, StringFormat=' #{0}'}"
-                               FontSize="11"
-                               Foreground="{StaticResource UIBorderColor}"/>
+                                       FontSize="11"
+                                       Foreground="{StaticResource UIBorderColor}"/>
                         </StackPanel>
                     </DataTemplate>
                 </TreeView.Resources>
             </TreeView>
         </Border>
+
         <!-- AUTO-PLACE TOOLBAR (CG1) -->
         <Border Grid.Row="2"
                 Background="{StaticResource UISecondaryColor}"
@@ -294,7 +331,8 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" FontSize="11"
+                <TextBlock Grid.Column="0"
+                           FontSize="11"
                            Foreground="{StaticResource UIBorderColor}"
                            VerticalAlignment="Center"
                            Text="Drag entities onto the grid, or use Auto-Place"/>
@@ -312,11 +350,8 @@
 
         <!-- CANVAS GRID + LINES OVERLAY -->
         <Grid Grid.Row="3" x:Name="CanvasArea">
-
-            <!-- Lines overlay -->
             <Canvas x:Name="LinesCanvas" IsHitTestVisible="False" Panel.ZIndex="10"/>
 
-            <!-- 4x3 Grid with * sizing — guaranteed to fill available space -->
             <Grid x:Name="SlotsGrid">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
@@ -330,121 +365,21 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- Row 0 -->
-                <ContentControl Grid.Row="0" Grid.Column="0"
-                                Content="{Binding Slots[0]}"
-                                ContentTemplate="{StaticResource SlotTemplate}"
-                                AllowDrop="True" Cursor="Hand"
-                                MouseMove="Slot_MouseMove"
-                                MouseLeftButtonDown="Slot_MouseLeftButtonDown"
-                                DragOver="Slot_DragOver" Drop="Slot_Drop"
-                                HorizontalContentAlignment="Stretch"
-                                VerticalContentAlignment="Stretch"/>
-                <ContentControl Grid.Row="0" Grid.Column="1"
-                                Content="{Binding Slots[1]}"
-                                ContentTemplate="{StaticResource SlotTemplate}"
-                                AllowDrop="True" Cursor="Hand"
-                                MouseMove="Slot_MouseMove"
-                                MouseLeftButtonDown="Slot_MouseLeftButtonDown"
-                                DragOver="Slot_DragOver" Drop="Slot_Drop"
-                                HorizontalContentAlignment="Stretch"
-                                VerticalContentAlignment="Stretch"/>
-                <ContentControl Grid.Row="0" Grid.Column="2"
-                                Content="{Binding Slots[2]}"
-                                ContentTemplate="{StaticResource SlotTemplate}"
-                                AllowDrop="True" Cursor="Hand"
-                                MouseMove="Slot_MouseMove"
-                                MouseLeftButtonDown="Slot_MouseLeftButtonDown"
-                                DragOver="Slot_DragOver" Drop="Slot_Drop"
-                                HorizontalContentAlignment="Stretch"
-                                VerticalContentAlignment="Stretch"/>
-                <ContentControl Grid.Row="0" Grid.Column="3"
-                                Content="{Binding Slots[3]}"
-                                ContentTemplate="{StaticResource SlotTemplate}"
-                                AllowDrop="True" Cursor="Hand"
-                                MouseMove="Slot_MouseMove"
-                                MouseLeftButtonDown="Slot_MouseLeftButtonDown"
-                                DragOver="Slot_DragOver" Drop="Slot_Drop"
-                                HorizontalContentAlignment="Stretch"
-                                VerticalContentAlignment="Stretch"/>
+                <ContentControl Grid.Row="0" Grid.Column="0" Content="{Binding Slots[0]}" ContentTemplate="{StaticResource SlotTemplate}" AllowDrop="True" Cursor="Hand" MouseMove="Slot_MouseMove" MouseLeftButtonDown="Slot_MouseLeftButtonDown" DragOver="Slot_DragOver" Drop="Slot_Drop" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+                <ContentControl Grid.Row="0" Grid.Column="1" Content="{Binding Slots[1]}" ContentTemplate="{StaticResource SlotTemplate}" AllowDrop="True" Cursor="Hand" MouseMove="Slot_MouseMove" MouseLeftButtonDown="Slot_MouseLeftButtonDown" DragOver="Slot_DragOver" Drop="Slot_Drop" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+                <ContentControl Grid.Row="0" Grid.Column="2" Content="{Binding Slots[2]}" ContentTemplate="{StaticResource SlotTemplate}" AllowDrop="True" Cursor="Hand" MouseMove="Slot_MouseMove" MouseLeftButtonDown="Slot_MouseLeftButtonDown" DragOver="Slot_DragOver" Drop="Slot_Drop" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+                <ContentControl Grid.Row="0" Grid.Column="3" Content="{Binding Slots[3]}" ContentTemplate="{StaticResource SlotTemplate}" AllowDrop="True" Cursor="Hand" MouseMove="Slot_MouseMove" MouseLeftButtonDown="Slot_MouseLeftButtonDown" DragOver="Slot_DragOver" Drop="Slot_Drop" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
 
-                <!-- Row 1 -->
-                <ContentControl Grid.Row="1" Grid.Column="0"
-                                Content="{Binding Slots[4]}"
-                                ContentTemplate="{StaticResource SlotTemplate}"
-                                AllowDrop="True" Cursor="Hand"
-                                MouseMove="Slot_MouseMove"
-                                MouseLeftButtonDown="Slot_MouseLeftButtonDown"
-                                DragOver="Slot_DragOver" Drop="Slot_Drop"
-                                HorizontalContentAlignment="Stretch"
-                                VerticalContentAlignment="Stretch"/>
-                <ContentControl Grid.Row="1" Grid.Column="1"
-                                Content="{Binding Slots[5]}"
-                                ContentTemplate="{StaticResource SlotTemplate}"
-                                AllowDrop="True" Cursor="Hand"
-                                MouseMove="Slot_MouseMove"
-                                MouseLeftButtonDown="Slot_MouseLeftButtonDown"
-                                DragOver="Slot_DragOver" Drop="Slot_Drop"
-                                HorizontalContentAlignment="Stretch"
-                                VerticalContentAlignment="Stretch"/>
-                <ContentControl Grid.Row="1" Grid.Column="2"
-                                Content="{Binding Slots[6]}"
-                                ContentTemplate="{StaticResource SlotTemplate}"
-                                AllowDrop="True" Cursor="Hand"
-                                MouseMove="Slot_MouseMove"
-                                MouseLeftButtonDown="Slot_MouseLeftButtonDown"
-                                DragOver="Slot_DragOver" Drop="Slot_Drop"
-                                HorizontalContentAlignment="Stretch"
-                                VerticalContentAlignment="Stretch"/>
-                <ContentControl Grid.Row="1" Grid.Column="3"
-                                Content="{Binding Slots[7]}"
-                                ContentTemplate="{StaticResource SlotTemplate}"
-                                AllowDrop="True" Cursor="Hand"
-                                MouseMove="Slot_MouseMove"
-                                MouseLeftButtonDown="Slot_MouseLeftButtonDown"
-                                DragOver="Slot_DragOver" Drop="Slot_Drop"
-                                HorizontalContentAlignment="Stretch"
-                                VerticalContentAlignment="Stretch"/>
+                <ContentControl Grid.Row="1" Grid.Column="0" Content="{Binding Slots[4]}" ContentTemplate="{StaticResource SlotTemplate}" AllowDrop="True" Cursor="Hand" MouseMove="Slot_MouseMove" MouseLeftButtonDown="Slot_MouseLeftButtonDown" DragOver="Slot_DragOver" Drop="Slot_Drop" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+                <ContentControl Grid.Row="1" Grid.Column="1" Content="{Binding Slots[5]}" ContentTemplate="{StaticResource SlotTemplate}" AllowDrop="True" Cursor="Hand" MouseMove="Slot_MouseMove" MouseLeftButtonDown="Slot_MouseLeftButtonDown" DragOver="Slot_DragOver" Drop="Slot_Drop" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+                <ContentControl Grid.Row="1" Grid.Column="2" Content="{Binding Slots[6]}" ContentTemplate="{StaticResource SlotTemplate}" AllowDrop="True" Cursor="Hand" MouseMove="Slot_MouseMove" MouseLeftButtonDown="Slot_MouseLeftButtonDown" DragOver="Slot_DragOver" Drop="Slot_Drop" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+                <ContentControl Grid.Row="1" Grid.Column="3" Content="{Binding Slots[7]}" ContentTemplate="{StaticResource SlotTemplate}" AllowDrop="True" Cursor="Hand" MouseMove="Slot_MouseMove" MouseLeftButtonDown="Slot_MouseLeftButtonDown" DragOver="Slot_DragOver" Drop="Slot_Drop" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
 
-                <!-- Row 2 -->
-                <ContentControl Grid.Row="2" Grid.Column="0"
-                                Content="{Binding Slots[8]}"
-                                ContentTemplate="{StaticResource SlotTemplate}"
-                                AllowDrop="True" Cursor="Hand"
-                                MouseMove="Slot_MouseMove"
-                                MouseLeftButtonDown="Slot_MouseLeftButtonDown"
-                                DragOver="Slot_DragOver" Drop="Slot_Drop"
-                                HorizontalContentAlignment="Stretch"
-                                VerticalContentAlignment="Stretch"/>
-                <ContentControl Grid.Row="2" Grid.Column="1"
-                                Content="{Binding Slots[9]}"
-                                ContentTemplate="{StaticResource SlotTemplate}"
-                                AllowDrop="True" Cursor="Hand"
-                                MouseMove="Slot_MouseMove"
-                                MouseLeftButtonDown="Slot_MouseLeftButtonDown"
-                                DragOver="Slot_DragOver" Drop="Slot_Drop"
-                                HorizontalContentAlignment="Stretch"
-                                VerticalContentAlignment="Stretch"/>
-                <ContentControl Grid.Row="2" Grid.Column="2"
-                                Content="{Binding Slots[10]}"
-                                ContentTemplate="{StaticResource SlotTemplate}"
-                                AllowDrop="True" Cursor="Hand"
-                                MouseMove="Slot_MouseMove"
-                                MouseLeftButtonDown="Slot_MouseLeftButtonDown"
-                                DragOver="Slot_DragOver" Drop="Slot_Drop"
-                                HorizontalContentAlignment="Stretch"
-                                VerticalContentAlignment="Stretch"/>
-                <ContentControl Grid.Row="2" Grid.Column="3"
-                                Content="{Binding Slots[11]}"
-                                ContentTemplate="{StaticResource SlotTemplate}"
-                                AllowDrop="True" Cursor="Hand"
-                                MouseMove="Slot_MouseMove"
-                                MouseLeftButtonDown="Slot_MouseLeftButtonDown"
-                                DragOver="Slot_DragOver" Drop="Slot_Drop"
-                                HorizontalContentAlignment="Stretch"
-                                VerticalContentAlignment="Stretch"/>
+                <ContentControl Grid.Row="2" Grid.Column="0" Content="{Binding Slots[8]}" ContentTemplate="{StaticResource SlotTemplate}" AllowDrop="True" Cursor="Hand" MouseMove="Slot_MouseMove" MouseLeftButtonDown="Slot_MouseLeftButtonDown" DragOver="Slot_DragOver" Drop="Slot_Drop" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+                <ContentControl Grid.Row="2" Grid.Column="1" Content="{Binding Slots[9]}" ContentTemplate="{StaticResource SlotTemplate}" AllowDrop="True" Cursor="Hand" MouseMove="Slot_MouseMove" MouseLeftButtonDown="Slot_MouseLeftButtonDown" DragOver="Slot_DragOver" Drop="Slot_Drop" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+                <ContentControl Grid.Row="2" Grid.Column="2" Content="{Binding Slots[10]}" ContentTemplate="{StaticResource SlotTemplate}" AllowDrop="True" Cursor="Hand" MouseMove="Slot_MouseMove" MouseLeftButtonDown="Slot_MouseLeftButtonDown" DragOver="Slot_DragOver" Drop="Slot_Drop" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+                <ContentControl Grid.Row="2" Grid.Column="3" Content="{Binding Slots[11]}" ContentTemplate="{StaticResource SlotTemplate}" AllowDrop="True" Cursor="Hand" MouseMove="Slot_MouseMove" MouseLeftButtonDown="Slot_MouseLeftButtonDown" DragOver="Slot_DragOver" Drop="Slot_Drop" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
             </Grid>
         </Grid>
-
     </Grid>
 </UserControl>

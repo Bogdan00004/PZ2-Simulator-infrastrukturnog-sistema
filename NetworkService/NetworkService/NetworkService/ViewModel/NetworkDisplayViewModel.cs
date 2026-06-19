@@ -56,9 +56,9 @@ namespace NetworkService.ViewModel
         public MyICommand ToggleConnectModeCommand { get; }
         public MyICommand<CanvasSlot> ClearSlotCommand { get; }
 
-        // =============================================
+      
         // Constructor
-        // =============================================
+       
         public NetworkDisplayViewModel()
         {
             Slots = new ObservableCollection<CanvasSlot>();
@@ -76,9 +76,7 @@ namespace NetworkService.ViewModel
             MainWindowViewModel.Entities.CollectionChanged += OnEntitiesCollectionChanged;
         }
 
-        // =============================================
         // TreeView initialization
-        // =============================================
         private void InitializeTreeView()
         {
             foreach (var entity in MainWindowViewModel.Entities)
@@ -110,6 +108,7 @@ namespace NetworkService.ViewModel
                 group = new PressureGaugeGroup
                 {
                     TypeName = typeName,
+                    TypeImagePath = entity.Type?.ImagePath ?? "",
                     TypeIcon = entity.Type?.Icon ?? FontAwesomeIcon.Circle,
                     TypeIconBrush = entity.Type?.IconBrush ?? new SolidColorBrush(Colors.Gray)
                 };
