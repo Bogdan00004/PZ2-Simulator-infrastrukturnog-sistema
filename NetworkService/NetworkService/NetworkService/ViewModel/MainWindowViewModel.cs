@@ -13,8 +13,7 @@ namespace NetworkService.ViewModel
     public class MainWindowViewModel : BindableBase
     {
         // Shared entities — accessible by all ViewModels
-        public static ObservableCollection<PressureGauge> Entities { get; private set; }
-            = new ObservableCollection<PressureGauge>();
+        public static ObservableCollection<PressureGauge> Entities { get; private set; } = new ObservableCollection<PressureGauge>();
 
         // Navigation
 
@@ -91,7 +90,7 @@ namespace NetworkService.ViewModel
             }
         }
 
-        // Navigation (CG1: Entities <-> Graph)
+        // Navigation
         private void OnNavigate(string destination)
         {
             switch (destination)
@@ -105,7 +104,7 @@ namespace NetworkService.ViewModel
             }
         }
 
-        // Pre-created sample entities (minimum 3)
+        // Pre-created sample entities 
         private void InitializeSampleEntities()
         {
             var cableSensor = PressureGaugeType.PredefinedTypes[0];
@@ -152,13 +151,11 @@ namespace NetworkService.ViewModel
                             NetworkStream stream = tcpClient.GetStream();
                             byte[] bytes = new byte[1024];
                             int bytesRead = stream.Read(bytes, 0, bytes.Length);
-                            string incoming = System.Text.Encoding.ASCII
-                                                        .GetString(bytes, 0, bytesRead);
+                            string incoming = System.Text.Encoding.ASCII.GetString(bytes, 0, bytesRead);
 
                             if (incoming.Equals("Need object count"))
                             {
-                                byte[] response = System.Text.Encoding.ASCII
-                                                    .GetBytes(Entities.Count.ToString());
+                                byte[] response = System.Text.Encoding.ASCII.GetBytes(Entities.Count.ToString());
                                 stream.Write(response, 0, response.Length);
                             }
                             else

@@ -11,8 +11,6 @@ namespace NetworkService.Model
         public int SlotIndexA { get; set; }
         public int SlotIndexB { get; set; }
 
-        public string Key => SlotIndexA < SlotIndexB
-            ? $"{SlotIndexA}-{SlotIndexB}"
-            : $"{SlotIndexB}-{SlotIndexA}";
+        public string Key => SlotIndexA < SlotIndexB ? $"{SlotIndexA}-{SlotIndexB}" : $"{SlotIndexB}-{SlotIndexA}";
     }
 }

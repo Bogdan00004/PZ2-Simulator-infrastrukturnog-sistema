@@ -13,7 +13,7 @@ namespace NetworkService.Views
     {
         private MeasurementGraphViewModel _viewModel;
 
-        // G3 drawing constants
+        // drawing constants
         private const double MinRadius = 14;
         private const double MaxRadius = 50;
         private const double TopPadding = 20;
@@ -46,9 +46,6 @@ namespace NetworkService.Views
             DrawGraph();
         }
 
-        // =============================================
-        // G3 — Circles of varying radius along time axis
-        // =============================================
         private void DrawGraph()
         {
             if (_viewModel == null) return;
@@ -71,11 +68,8 @@ namespace NetworkService.Views
 
                 NoDataPanel.Visibility = Visibility.Collapsed;
 
-                // ---------------------------------------------------
                 // Determine value-to-radius scale based on the data
-                // actually displayed, with the entity's valid range
-                // as a minimum reference so the scale isn't too tight.
-                // ---------------------------------------------------
+
                 double dataMin = history.Min(h => h.Value);
                 double dataMax = history.Max(h => h.Value);
 
@@ -85,9 +79,7 @@ namespace NetworkService.Views
                 if (Math.Abs(scaleMax - scaleMin) < 0.0001)
                     scaleMax = scaleMin + 1;
 
-                // ---------------------------------------------------
                 // Layout: points evenly spaced along X axis
-                // ---------------------------------------------------
                 int count = history.Count;
                 double usableWidth = Math.Max(width - 2 * SidePadding, 50);
                 double step = count > 1 ? usableWidth / (count - 1) : 0;
@@ -95,9 +87,7 @@ namespace NetworkService.Views
                 // X-axis baseline (for time labels)
                 double axisY = height - AxisLabelHeight;
 
-                // Dynamically size the max radius based on available
-                // vertical space, then vertically center the row of
-                // circles within the plot area
+                // dinamic max radius based on available height
                 double graphAreaHeight = Math.Max(axisY - TopPadding, 50);
                 double dynamicMaxRadius = Math.Min(MaxRadius, graphAreaHeight / 2.0 - 4);
                 dynamicMaxRadius = Math.Max(dynamicMaxRadius, MinRadius);
@@ -119,9 +109,7 @@ namespace NetworkService.Views
                 {
                     var record = history[i];
 
-                    double centerX = count == 1
-                        ? width / 2.0
-                        : SidePadding + i * step;
+                    double centerX = count == 1 ? width / 2.0 : SidePadding + i * step;
 
                     // Map value -> radius
                     double ratio = (record.Value - scaleMin) / (scaleMax - scaleMin);
@@ -132,7 +120,7 @@ namespace NetworkService.Views
                         ? Color.FromRgb(61, 139, 94)   // UISuccessColor
                         : Color.FromRgb(192, 57, 43);  // UIDangerColor
 
-                    // --- Connecting line to previous point ---
+                    //  Connecting line to previous point 
                     if (i > 0)
                     {
                         double prevX = SidePadding + (i - 1) * step;
@@ -149,7 +137,7 @@ namespace NetworkService.Views
                         });
                     }
 
-                    // --- Tick mark + time label on X axis ---
+                    // Tick mark + time label on X axis 
                     GraphCanvas.Children.Add(new Line
                     {
                         X1 = centerX,
@@ -171,7 +159,7 @@ namespace NetworkService.Views
                     Canvas.SetTop(timeLabel, axisY + 8);
                     GraphCanvas.Children.Add(timeLabel);
 
-                    // --- Circle marker ---
+                    //  Circle marker 
                     var ellipse = new Ellipse
                     {
                         Width = radius * 2,
@@ -184,7 +172,7 @@ namespace NetworkService.Views
                     Canvas.SetTop(ellipse, centerY - radius);
                     GraphCanvas.Children.Add(ellipse);
 
-                    // --- Value label inside circle ---
+                    // Value label inside circle 
                     var valueLabel = new TextBlock
                     {
                         Text = record.Value.ToString("F1"),

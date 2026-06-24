@@ -50,8 +50,7 @@ namespace NetworkService.Model
 
         // Measurement history — last 5 readings
 
-        public ObservableCollection<MeasurementRecord> History { get; }
-            = new ObservableCollection<MeasurementRecord>();
+        public ObservableCollection<MeasurementRecord> History { get; } = new ObservableCollection<MeasurementRecord>();
 
         public const int MaxHistorySize = 5;
 
@@ -72,17 +71,11 @@ namespace NetworkService.Model
 
         public string TypeName => _type?.Name ?? "Unknown";
 
-        public bool IsValueValid => _currentValue.HasValue
-                                     && _currentValue.Value >= MinValidValue
-                                     && _currentValue.Value <= MaxValidValue;
+        public bool IsValueValid => _currentValue.HasValue && _currentValue.Value >= MinValidValue  && _currentValue.Value <= MaxValidValue;
 
-        public string ValueDisplay => _currentValue.HasValue
-                                      ? $"{_currentValue.Value:F2} MPa"
-                                      : "No reading";
+        public string ValueDisplay => _currentValue.HasValue ? $"{_currentValue.Value:F2} MPa" : "No reading";
 
-        public string StatusText => !_currentValue.HasValue
-                                     ? "NO READING"
-                                     : IsValueValid ? "VALID" : "OUT OF RANGE";
+        public string StatusText => !_currentValue.HasValue ? "NO READING" : IsValueValid ? "VALID" : "OUT OF RANGE";
 
         protected override void ValidateSelf()
         {

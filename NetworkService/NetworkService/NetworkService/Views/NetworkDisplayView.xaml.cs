@@ -29,9 +29,7 @@ namespace NetworkService.Views
             SizeChanged += (s, args) => RedrawLines();
         }
 
-        // =============================================
-        // TreeView drag — PreviewMouseMove approach
-        // =============================================
+        // TreeView drag — PreviewMouseMove 
         private void TreeView_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             _treeDragStartPoint = e.GetPosition(null);
@@ -44,9 +42,7 @@ namespace NetworkService.Views
             var currentPos = e.GetPosition(null);
             var diff = _treeDragStartPoint - currentPos;
 
-            bool movedEnough =
-                Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance ||
-                Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance;
+            bool movedEnough = Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance || Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance;
 
             if (!movedEnough) return;
 
@@ -57,10 +53,9 @@ namespace NetworkService.Views
             DragDrop.DoDragDrop(EntitiesTreeView, entity, DragDropEffects.Move);
         }
 
-        private void TreeView_SelectedItemChanged(object sender,
-            RoutedPropertyChangedEventArgs<object> e)
+        private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            // Selection change alone does not start drag anymore
+           
         }
 
         private void TreeView_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -69,9 +64,9 @@ namespace NetworkService.Views
             _viewModel?.ResetDragState();
         }
 
-        // =============================================
+        
         // Slot drag (slot to slot)
-        // =============================================
+        
         private void Slot_MouseMove(object sender, MouseEventArgs e)
         {
             if (e.LeftButton != MouseButtonState.Pressed) return;
@@ -89,9 +84,9 @@ namespace NetworkService.Views
             _isDragging = false;
         }
 
-        // =============================================
+        
         // Slot click — connect mode
-        // =============================================
+       
         private void Slot_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (_viewModel?.IsConnectModeActive != true) return;
@@ -105,15 +100,13 @@ namespace NetworkService.Views
             }
         }
 
-        // =============================================
+
         // Slot DragOver / Drop
-        // =============================================
+
         private void Slot_DragOver(object sender, DragEventArgs e)
         {
             var slot = GetSlotFromSender(sender);
-            e.Effects = _viewModel?.CanDropOnSlot(slot) == true
-                ? DragDropEffects.Move
-                : DragDropEffects.None;
+            e.Effects = _viewModel?.CanDropOnSlot(slot) == true ? DragDropEffects.Move : DragDropEffects.None;
             e.Handled = true;
         }
 
@@ -125,9 +118,8 @@ namespace NetworkService.Views
             e.Handled = true;
         }
 
-        // =============================================
+
         // Line drawing
-        // =============================================
         private void RedrawLines()
         {
             if (_viewModel == null) return;
@@ -163,15 +155,11 @@ namespace NetworkService.Views
             int col = slotIndex % 4;
             int row = slotIndex / 4;
 
-            return new Point(
-                col * cellWidth + cellWidth / 2.0,
-                row * cellHeight + cellHeight / 2.0
-            );
+            return new Point(col * cellWidth + cellWidth / 2.0, row * cellHeight + cellHeight / 2.0);
         }
 
-        // =============================================
         // Helpers
-        // =============================================
+
         private CanvasSlot GetSlotFromSender(object sender)
         {
             if (sender is ContentControl cc)

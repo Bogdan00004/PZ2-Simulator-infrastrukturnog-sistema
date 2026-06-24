@@ -29,7 +29,7 @@ namespace NetworkService.ViewModel
             }
         }
 
-        // Redraw event — code-behind subscribes
+        // Redraw event 
         public event Action GraphNeedsRedraw;
 
         // Constructor

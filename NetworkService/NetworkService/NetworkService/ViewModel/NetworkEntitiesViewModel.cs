@@ -38,19 +38,23 @@ namespace NetworkService.ViewModel
             }
         }
 
+        private bool _isLoadingSavedSearch = false;
+
         public string SearchText
         {
             get => _searchText;
             set
             {
                 SetProperty(ref _searchText, value);
-                ApplyFilter();
-                SaveSearchCommand.RaiseCanExecuteChanged();
+                if (!_isLoadingSavedSearch)
+                    SelectedSavedSearch = null;
+                _entitiesView.Refresh();
+                SaveSearchCommand?.RaiseCanExecuteChanged();
             }
         }
 
-        // Saved searches (CG1)
-      
+        // Saved searches
+
         public ObservableCollection<SavedSearch> SavedSearches { get; } = new ObservableCollection<SavedSearch>();
 
         private SavedSearch _selectedSavedSearch;
@@ -64,7 +68,7 @@ namespace NetworkService.ViewModel
             }
         }
 
-        // Add entity properties (CG1: type only)
+        // Add entity properties 
 
         private PressureGaugeType _selectedTypeToAdd;
         public PressureGaugeType SelectedTypeToAdd
@@ -131,7 +135,7 @@ namespace NetworkService.ViewModel
             ClearSearchCommand = new MyICommand(OnClearSearch);
         }
 
-        // Filter logic (P1)
+        // Filter logic 
         
         private bool FilterEntity(object obj)
         {
@@ -151,7 +155,7 @@ namespace NetworkService.ViewModel
 
         private void ApplyFilter() => _entitiesView.Refresh();
 
-        // Add entity (CG1: auto-generate ID and Name)
+        // Add entity auto-generate ID and Name
         private void OnAdd()
         {
             if (SelectedTypeToAdd == null)
@@ -184,12 +188,7 @@ namespace NetworkService.ViewModel
         {
             if (SelectedEntity == null) return;
 
-            var result = MessageBox.Show(
-                $"Are you sure you want to delete '{SelectedEntity.Name}' (ID: {SelectedEntity.Id})?",
-                "Confirm Delete",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Warning
-            );
+            var result = MessageBox.Show($"Are you sure you want to delete '{SelectedEntity.Name}' (ID: {SelectedEntity.Id})?", "Confirm Delete",MessageBoxButton.YesNo,MessageBoxImage.Warning);
 
             if (result != MessageBoxResult.Yes) return;
 
@@ -201,15 +200,12 @@ namespace NetworkService.ViewModel
 
             _entitiesView.Refresh();
 
-            ToastNotificationService.ShowSuccess(
-                "Entity Deleted",
-                $"'{deletedName}' (ID: {deletedId}) removed successfully."
-            );
+            ToastNotificationService.ShowSuccess("Entity Deleted", $"'{deletedName}' (ID: {deletedId}) removed successfully.");
 
             MainWindowViewModel.RestartSimulator();
         }
 
-        // Save search (CG1)
+        // Save search 
         private bool CanSaveSearch() => !string.IsNullOrWhiteSpace(SearchText);
 
         private void OnSaveSearch()
@@ -235,13 +231,15 @@ namespace NetworkService.ViewModel
 
         private void LoadSavedSearch(SavedSearch search)
         {
+            _isLoadingSavedSearch = true;
             SearchByName = search.SearchBy == "Name";
             SearchByType = search.SearchBy == "Type";
             SearchText = search.SearchText;
+            _isLoadingSavedSearch = false;
         }
 
         // Clear search
-       
+
         private void OnClearSearch()
         {
             SearchText = string.Empty;

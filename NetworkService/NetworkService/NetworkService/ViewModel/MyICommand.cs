@@ -3,7 +3,6 @@ using System.Windows.Input;
 
 namespace NetworkService.ViewModel
 {
-    // Verzija bez parametra
     public class MyICommand : ICommand
     {
         private readonly Action _execute;
@@ -27,7 +26,6 @@ namespace NetworkService.ViewModel
         }
     }
 
-    // Verzija sa parametrom
     public class MyICommand<T> : ICommand
     {
         private readonly Action<T> _execute;

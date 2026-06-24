@@ -10,16 +10,10 @@ namespace NetworkService.ViewModel
 {
     public class NetworkDisplayViewModel : BindableBase
     {
-        // =============================================
-        // Collections
-        // =============================================
         public ObservableCollection<CanvasSlot> Slots { get; }
         public ObservableCollection<PressureGaugeGroup> TreeViewGroups { get; }
         public ObservableCollection<EntityConnection> Connections { get; }
-
-        // =============================================
         // Connect mode
-        // =============================================
         private bool _isConnectModeActive;
         public bool IsConnectModeActive
         {
@@ -32,26 +26,18 @@ namespace NetworkService.ViewModel
             }
         }
 
-        public string ConnectModeButtonText =>
-            IsConnectModeActive ? "Exit Connect" : "Connect";
+        public string ConnectModeButtonText => IsConnectModeActive ? "Exit Connect" : "Connect";
 
         private CanvasSlot _firstSelectedForConnection;
 
-        // =============================================
         // Drag state
-        // =============================================
         public bool IsDragging { get; private set; }
         public PressureGauge DraggedEntity { get; private set; }
         public int? DragSourceSlotIndex { get; private set; }
 
-        // =============================================
-        // Event for line redraw (code-behind subscribes)
-        // =============================================
+        // Event for line redraw
         public event Action LinesNeedRedraw;
-
-        // =============================================
         // Commands
-        // =============================================
         public MyICommand AutoPlaceCommand { get; }
         public MyICommand ToggleConnectModeCommand { get; }
         public MyICommand<CanvasSlot> ClearSlotCommand { get; }
@@ -143,12 +129,8 @@ namespace NetworkService.ViewModel
             AutoPlaceCommand.RaiseCanExecuteChanged();
         }
 
-        // =============================================
-        // Auto-place (CG1)
-        // =============================================
-        private bool CanAutoPlace() =>
-            TreeViewGroups.Any(g => g.Entities.Count > 0) &&
-            Slots.Any(s => s.IsEmpty);
+        // Auto-place 
+        private bool CanAutoPlace() =>TreeViewGroups.Any(g => g.Entities.Count > 0) && Slots.Any(s => s.IsEmpty);
 
         private void OnAutoPlace()
         {
@@ -176,9 +158,7 @@ namespace NetworkService.ViewModel
             AutoPlaceCommand.RaiseCanExecuteChanged();
         }
 
-        // =============================================
         // Clear slot — return entity to TreeView
-        // =============================================
         private void OnClearSlot(CanvasSlot slot)
         {
             if (slot?.Entity == null) return;
@@ -195,16 +175,12 @@ namespace NetworkService.ViewModel
 
         private void RemoveConnectionsForSlot(int slotIndex)
         {
-            var toRemove = Connections
-                .Where(c => c.SlotIndexA == slotIndex || c.SlotIndexB == slotIndex)
-                .ToList();
+            var toRemove = Connections.Where(c => c.SlotIndexA == slotIndex || c.SlotIndexB == slotIndex).ToList();
             foreach (var c in toRemove)
                 Connections.Remove(c);
         }
 
-        // =============================================
         // Connection mode
-        // =============================================
         public void SelectForConnection(CanvasSlot slot)
         {
             if (!IsConnectModeActive || slot?.Entity == null) return;
@@ -222,9 +198,7 @@ namespace NetworkService.ViewModel
             else
             {
                 // Check for duplicate
-                bool exists = Connections.Any(c =>
-                    (c.SlotIndexA == _firstSelectedForConnection.Index && c.SlotIndexB == slot.Index) ||
-                    (c.SlotIndexA == slot.Index && c.SlotIndexB == _firstSelectedForConnection.Index));
+                bool exists = Connections.Any(c =>(c.SlotIndexA == _firstSelectedForConnection.Index && c.SlotIndexB == slot.Index) || (c.SlotIndexA == slot.Index && c.SlotIndexB == _firstSelectedForConnection.Index));
 
                 if (!exists)
                 {
@@ -248,9 +222,8 @@ namespace NetworkService.ViewModel
             _firstSelectedForConnection = null;
         }
 
-        // =============================================
-        // Drag state — called from code-behind
-        // =============================================
+
+        // Drag state 
         public void StartDragFromTreeView(PressureGauge entity)
         {
             IsDragging = true;
@@ -270,8 +243,7 @@ namespace NetworkService.ViewModel
         {
             if (!IsDragging || DraggedEntity == null) return false;
             if (targetSlot.IsOccupied) return false;
-            if (DragSourceSlotIndex.HasValue &&
-                DragSourceSlotIndex.Value == targetSlot.Index) return false;
+            if (DragSourceSlotIndex.HasValue && DragSourceSlotIndex.Value == targetSlot.Index) return false;
             return true;
         }
 

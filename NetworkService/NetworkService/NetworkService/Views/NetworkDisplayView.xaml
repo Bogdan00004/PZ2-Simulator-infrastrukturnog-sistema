@@ -261,7 +261,7 @@
             </Grid>
         </Border>
 
-        <!-- TREE VIEW with PNG images -->
+        <!-- TREE VIEW -->
         <Border Grid.Row="1"
                 BorderBrush="{StaticResource UIBorderColor}"
                 BorderThickness="0,0,0,1"
@@ -280,6 +280,7 @@
                     <Style TargetType="TreeViewItem">
                         <Setter Property="IsExpanded" Value="True"/>
                         <Setter Property="Foreground" Value="{StaticResource UITextColor}"/>
+                        <Setter Property="Cursor" Value="Hand"/>
                     </Style>
                 </TreeView.ItemContainerStyle>
 
